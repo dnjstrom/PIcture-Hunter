@@ -9,10 +9,10 @@ import java.io.File;
 import se.nielstrom.picture_hunter.fragments.AlbumListFragment;
 
 
-public class AlbumListAdapter extends FragmentPagerAdapter{
+public class AlbumPagerAdapter extends FragmentPagerAdapter{
     File[] albums = createBaseFolders();
 
-    public AlbumListAdapter(FragmentManager fm) {
+    public AlbumPagerAdapter(FragmentManager fm) {
         super(fm);
     }
 

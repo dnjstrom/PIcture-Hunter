@@ -3,7 +3,6 @@ package se.nielstrom.picture_hunter.fragments;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,9 +47,9 @@ public class AlbumListFragment extends Fragment implements AdapterView.OnItemCli
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_album_list, container, false);
+        View root = inflater.inflate(R.layout.fragment_album_grid, container, false);
 
-        GridView grid = (GridView) root.findViewById(R.id.gridView);
+        GridView grid = (GridView) root.findViewById(R.id.album_grid);
 
         grid.setAdapter(new FolderAdapter(getActivity(), file.listFiles(new FileFilter() {
             @Override
@@ -68,8 +67,8 @@ public class AlbumListFragment extends Fragment implements AdapterView.OnItemCli
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         Intent intent = new Intent(getActivity(), PhotoListActivity.class);
         File file = (File) adapterView.getAdapter().getItem(i);
-        intent.putExtra(PhotoListActivity.KEY_PATH, file.getAbsolutePath());
+        intent.putExtra(PhotoListActivity.KEY_PATH, file.getParentFile().getAbsolutePath());
+        intent.putExtra(PhotoListActivity.KEY_POSITION, i);
         startActivity(intent);
-
     }
 }

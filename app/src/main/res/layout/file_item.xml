@@ -4,4 +4,20 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <se.nielstrom.picture_hunter.views.SquareView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:gravity="center"
+            android:text="File Item"
+            android:textSize="20sp"
+            />
+
+
+    </se.nielstrom.picture_hunter.views.SquareView>
+
 </LinearLayout>
