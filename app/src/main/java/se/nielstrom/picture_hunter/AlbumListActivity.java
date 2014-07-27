@@ -3,10 +3,13 @@ package se.nielstrom.picture_hunter;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 
-public class MainActivity extends FragmentActivity {
+public class AlbumListActivity extends FragmentActivity {
 
     private AlbumListAdapter adapter;
     private ViewPager pager;
@@ -14,7 +17,7 @@ public class MainActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_album_list);
 
         adapter = new AlbumListAdapter(getSupportFragmentManager());
         pager = (ViewPager) findViewById(R.id.pager);
