@@ -67,9 +67,9 @@ public class AlbumListActivity extends FragmentActivity {
     }
 
     public void addItem(View button) {
-        Toast.makeText(this, "New Album", Toast.LENGTH_LONG).show();
         File location = adapter.getFolder(pager.getCurrentItem());
-        adapter.add(storage.createAlbumAt(location));
+        storage.createAlbumAt(location);
+        //adapter.add();
 
     }
 }

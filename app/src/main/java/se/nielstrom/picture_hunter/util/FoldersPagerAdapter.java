@@ -38,11 +38,6 @@ public abstract class FoldersPagerAdapter extends FragmentStatePagerAdapter {
         return location;
     }
 
-    public void add(File file) {
-        folders.add(file);
-        notifyDataSetChanged();
-    }
-
     @Override
     public int getItemPosition(Object object) {
         return POSITION_NONE;

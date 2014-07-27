@@ -51,12 +51,7 @@ public class AlbumListFragment extends Fragment implements AdapterView.OnItemCli
 
         GridView grid = (GridView) root.findViewById(R.id.album_grid);
 
-        grid.setAdapter(new FolderAdapter(getActivity(), file.listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                return file.isDirectory();
-            }
-        })));
+        grid.setAdapter(new FolderAdapter(getActivity(), file));
 
         grid.setOnItemClickListener(this);
 
@@ -67,6 +62,7 @@ public class AlbumListFragment extends Fragment implements AdapterView.OnItemCli
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         Intent intent = new Intent(getActivity(), PhotoListActivity.class);
         File file = (File) adapterView.getAdapter().getItem(i);
+        File parent = file.getParentFile();
         intent.putExtra(PhotoListActivity.KEY_PATH, file.getParentFile().getAbsolutePath());
         intent.putExtra(PhotoListActivity.KEY_POSITION, i);
         startActivity(intent);
