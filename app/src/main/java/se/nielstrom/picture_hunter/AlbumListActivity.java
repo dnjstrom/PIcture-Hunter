@@ -1,18 +1,20 @@
 package se.nielstrom.picture_hunter;
 
 import android.os.Bundle;
-import android.os.Environment;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
-import java.io.File;
+import se.nielstrom.picture_hunter.fragments.AlbumListFragment;
+import se.nielstrom.picture_hunter.util.FoldersPagerAdapter;
+import se.nielstrom.picture_hunter.util.Storage;
 
 public class AlbumListActivity extends FragmentActivity {
 
-    private AlbumPagerAdapter adapter;
+    private FoldersPagerAdapter adapter;
     private ViewPager pager;
 
     @Override
@@ -20,7 +22,21 @@ public class AlbumListActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album_list);
 
-        adapter = new AlbumPagerAdapter(getSupportFragmentManager());
+        Storage storage = new Storage();
+
+        if (!storage.exists()) {
+            Toast.makeText(this, "The app requires an external storage to be present.", Toast.LENGTH_LONG).show();
+            finish();
+            return; // quit early
+        }
+
+        adapter = new FoldersPagerAdapter(getSupportFragmentManager(), storage.getAppFolder()) {
+            @Override
+            public Fragment getItem(int position) {
+                return AlbumListFragment.newInstance(albums[position].getAbsolutePath());
+            }
+        };
+
         pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(adapter);
 

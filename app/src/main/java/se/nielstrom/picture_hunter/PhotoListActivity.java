@@ -1,16 +1,16 @@
 package se.nielstrom.picture_hunter;
 
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import java.io.File;
 
-import se.nielstrom.picture_hunter.R;
+import se.nielstrom.picture_hunter.fragments.PhotoListFragment;
+import se.nielstrom.picture_hunter.util.FoldersPagerAdapter;
 
 public class PhotoListActivity extends FragmentActivity {
 
@@ -20,6 +20,7 @@ public class PhotoListActivity extends FragmentActivity {
     private String path;
     private File file;
     private ViewPager pager;
+    private FoldersPagerAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +33,14 @@ public class PhotoListActivity extends FragmentActivity {
         file = new File(path);
 
         pager = (ViewPager) findViewById(R.id.pager);
-        PhotoPagerAdapter adapter = new PhotoPagerAdapter(getSupportFragmentManager(), file);
+
+        adapter = new FoldersPagerAdapter(getSupportFragmentManager(), file) {
+            @Override
+            public Fragment getItem(int position) {
+                return PhotoListFragment.newInstance(albums[position].getAbsolutePath());
+            }
+        };
+
         pager.setAdapter(adapter);
 
         pager.setCurrentItem(startPosition);
