@@ -6,7 +6,10 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
+
+import java.io.File;
 
 import se.nielstrom.picture_hunter.fragments.AlbumListFragment;
 import se.nielstrom.picture_hunter.util.FoldersPagerAdapter;
@@ -16,13 +19,14 @@ public class AlbumListActivity extends FragmentActivity {
 
     private FoldersPagerAdapter adapter;
     private ViewPager pager;
+    private Storage storage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album_list);
 
-        Storage storage = new Storage();
+        storage = new Storage();
 
         if (!storage.exists()) {
             Toast.makeText(this, "The app requires an external storage to be present.", Toast.LENGTH_LONG).show();
@@ -33,7 +37,7 @@ public class AlbumListActivity extends FragmentActivity {
         adapter = new FoldersPagerAdapter(getSupportFragmentManager(), storage.getAppFolder()) {
             @Override
             public Fragment getItem(int position) {
-                return AlbumListFragment.newInstance(albums[position].getAbsolutePath());
+                return AlbumListFragment.newInstance(folders.get(position).getAbsolutePath());
             }
         };
 
@@ -60,5 +64,12 @@ public class AlbumListActivity extends FragmentActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void addItem(View button) {
+        Toast.makeText(this, "New Album", Toast.LENGTH_LONG).show();
+        File location = adapter.getFolder(pager.getCurrentItem());
+        adapter.add(storage.createAlbumAt(location));
+
     }
 }

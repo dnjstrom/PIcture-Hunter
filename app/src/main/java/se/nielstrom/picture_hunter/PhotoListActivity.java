@@ -37,7 +37,7 @@ public class PhotoListActivity extends FragmentActivity {
         adapter = new FoldersPagerAdapter(getSupportFragmentManager(), file) {
             @Override
             public Fragment getItem(int position) {
-                return PhotoListFragment.newInstance(albums[position].getAbsolutePath());
+                return PhotoListFragment.newInstance(folders.get(position).getAbsolutePath());
             }
         };
 

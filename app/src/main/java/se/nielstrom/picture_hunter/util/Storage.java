@@ -53,4 +53,18 @@ public class Storage {
     public File getAppFolder() {
         return appFolder;
     }
+
+    public File createAlbumAt(File location) {
+        String name = "New Album";
+
+        File album = new File(location.getAbsolutePath() + File.separator + name);
+
+        for (int i = 0; album.exists(); i++) {
+            album = new File(location.getAbsolutePath() + File.separator + name + " " + i);
+        }
+
+        album.mkdirs();
+
+        return album;
+    }
 }

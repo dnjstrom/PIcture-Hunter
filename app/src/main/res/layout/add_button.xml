@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<se.nielstrom.picture_hunter.views.SquareView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:id="@+id/button_new_album"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:text="New Album"
+        android:onClick="addItem"
+        />
+
+</se.nielstrom.picture_hunter.views.SquareView>

@@ -30,12 +30,16 @@ public class FolderAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return files.length;
+        return files.length + 1;
     }
 
     @Override
     public File getItem(int position) {
-        return files[position];
+        if (position > files.length) {
+            return null;
+        } else {
+            return files[position];
+        }
     }
 
     @Override
@@ -45,11 +49,20 @@ public class FolderAdapter extends BaseAdapter {
 
     @Override
     public View getView(int i, View view, ViewGroup parent) {
+
+        if (i >= files.length) {
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            view = inflater.inflate(R.layout.add_button, parent, false);
+            view.setTag("button");
+            return view;
+        }
+
+
         File file = files[i];
 
         ViewHolder holder;
 
-        if (view == null) {
+        if (view == null || view.getTag() == "button") {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(R.layout.folder_item, parent, false);
             holder = new ViewHolder(view);

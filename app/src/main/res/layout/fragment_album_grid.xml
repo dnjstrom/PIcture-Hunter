@@ -1,10 +1,9 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.AlbumListFragment">
-
-    <!-- TODO: Update blank fragment layout -->
+    tools:context=".fragments.AlbumListFragment"
+    android:orientation="vertical">
 
     <GridView
         android:layout_width="fill_parent"
@@ -16,4 +15,4 @@
         android:stretchMode="columnWidth"
         />
 
-</FrameLayout>
+</LinearLayout>
