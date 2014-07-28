@@ -1,36 +1,31 @@
-package se.nielstrom.picture_hunter.fragments;
+package se.nielstrom.picture_hunter.util;
 
 import android.content.Context;
 import android.os.Bundle;
 import android.os.FileObserver;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
-import se.nielstrom.picture_hunter.AlbumListActivity;
 import se.nielstrom.picture_hunter.R;
 
 
-public class FolderAdapter extends ArrayAdapter<File> {
+public abstract class FileAdapter extends ArrayAdapter<File> {
     private static final int FILE_EVENTS = FileObserver.CREATE | FileObserver.DELETE | FileObserver.MOVED_FROM | FileObserver.MOVED_TO;
+
+    private static final String BUTTON_TAG = FileAdapter.class + "_add_button";
 
     private static final int DATA_CHANGED = 0;
     private static final String KEY_PATH = "KEY_PATH";
 
     private final FileObserver observer;
+    private final int addButtonId;
     private File location;
     private Context context;
 
@@ -50,33 +45,16 @@ public class FolderAdapter extends ArrayAdapter<File> {
         }
     };
 
-    public FolderAdapter(final Context context, File location) {
+    public FileAdapter(final Context context, int addButtonId, File location, FileFilter filter) {
         super(context, R.layout.folder_item);
 
         this.context = context;
+        this.addButtonId = addButtonId;
         this.location = location;
 
-        addAll(location.listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                return file.isDirectory();
-            }
-        }));
+        addAll(location.listFiles(filter));
 
-
-        observer = new FileObserver(location.getAbsolutePath(), FILE_EVENTS) {
-            @Override
-            public void onEvent(int event, String path) {
-                // Delegate to the ui-thread
-                Message msg = Message.obtain();
-                msg.what = event;
-                Bundle data = new Bundle();
-                data.putString(KEY_PATH, path);
-                msg.setData(data);
-                handler.sendMessage(msg);
-            }
-        };
-
+        observer = new Observer(location.getAbsolutePath());
         observer.startWatching();
     }
 
@@ -105,36 +83,38 @@ public class FolderAdapter extends ArrayAdapter<File> {
 
         if (i == super.getCount()) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = inflater.inflate(R.layout.add_button, parent, false);
-            view.setTag("button");
+            view = inflater.inflate(addButtonId, parent, false);
+            view.setTag(BUTTON_TAG);
             return view;
-        }
-
-
-        File file = getItem(i);
-
-        ViewHolder holder;
-
-        if (view == null || view.getTag() == "button") {
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = inflater.inflate(R.layout.folder_item, parent, false);
-            holder = new ViewHolder(view);
-            view.setTag(holder);
+        } else if (isButton(view)) {
+            return createFileView(i, null, parent);
         } else {
-            holder = (ViewHolder) view.getTag();
+            return createFileView(i, view, parent);
         }
+    }
 
-        holder.title.setText(file.getName());
+    protected abstract View createFileView(int position, View view, ViewGroup parent);
 
-        return view;
+    public boolean isButton(View view) {
+        return view != null && view.getTag() == BUTTON_TAG;
     }
 
 
-    private class ViewHolder {
-        public TextView title;
+    private class Observer extends FileObserver {
 
-        public ViewHolder(View view) {
-            title = (TextView) view.findViewById(R.id.title);
+        public Observer(String path) {
+            super(path, FILE_EVENTS);
+        }
+
+        @Override
+        public void onEvent(int event, String path) {
+            // Delegate to the ui-thread
+            Message msg = Message.obtain();
+            msg.what = event;
+            Bundle data = new Bundle();
+            data.putString(KEY_PATH, path);
+            msg.setData(data);
+            handler.sendMessage(msg);
         }
     }
 }

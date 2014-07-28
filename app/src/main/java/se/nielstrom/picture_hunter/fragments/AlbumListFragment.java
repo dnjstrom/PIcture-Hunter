@@ -1,5 +1,6 @@
 package se.nielstrom.picture_hunter.fragments;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,12 +9,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileFilter;
 
 import se.nielstrom.picture_hunter.PhotoListActivity;
 import se.nielstrom.picture_hunter.R;
+import se.nielstrom.picture_hunter.util.FileAdapter;
 
 
 public class AlbumListFragment extends Fragment implements AdapterView.OnItemClickListener {
@@ -51,7 +54,7 @@ public class AlbumListFragment extends Fragment implements AdapterView.OnItemCli
 
         GridView grid = (GridView) root.findViewById(R.id.album_grid);
 
-        grid.setAdapter(new FolderAdapter(getActivity(), file));
+        grid.setAdapter(new AlbumAdapter(getActivity(), file));
 
         grid.setOnItemClickListener(this);
 
@@ -66,5 +69,47 @@ public class AlbumListFragment extends Fragment implements AdapterView.OnItemCli
         intent.putExtra(PhotoListActivity.KEY_PATH, file.getParentFile().getAbsolutePath());
         intent.putExtra(PhotoListActivity.KEY_POSITION, i);
         startActivity(intent);
+    }
+
+
+    private class AlbumAdapter extends FileAdapter {
+
+        public AlbumAdapter(Context context, File location) {
+            super(context, R.layout.add_button, location, new FileFilter() {
+                @Override
+                public boolean accept(File file) {
+                    return file.isDirectory();
+                }
+            });
+        }
+
+        @Override
+        protected View createFileView(int position, View view, ViewGroup parent) {
+            File file = getItem(position);
+
+            ViewHolder holder;
+
+            if (view == null ) {
+                LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                view = inflater.inflate(R.layout.folder_item, parent, false);
+                holder = new ViewHolder(view);
+                view.setTag(holder);
+            } else {
+                holder = (ViewHolder) view.getTag();
+            }
+
+            holder.title.setText(file.getName());
+
+            return view;
+        }
+
+
+        private class ViewHolder {
+            public TextView title;
+
+            public ViewHolder(View view) {
+                title = (TextView) view.findViewById(R.id.title);
+            }
+        }
     }
 }

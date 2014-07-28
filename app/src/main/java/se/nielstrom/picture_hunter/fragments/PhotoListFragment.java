@@ -1,16 +1,19 @@
 package se.nielstrom.picture_hunter.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
+import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileFilter;
 
 import se.nielstrom.picture_hunter.R;
+import se.nielstrom.picture_hunter.util.FileAdapter;
 
 public class PhotoListFragment extends Fragment {
     private static final String KEY_PATH = "KEY_PATH";
@@ -45,13 +48,51 @@ public class PhotoListFragment extends Fragment {
 
         GridView grid = (GridView) root.findViewById(R.id.photo_grid);
 
-        grid.setAdapter(new FileAdapter(getActivity(), file.listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                return file.isFile();
-            }
-        })));
+        grid.setAdapter(new PictureAdapter(getActivity(), file));
+
         return root;
+    }
+
+
+    private class PictureAdapter extends FileAdapter {
+
+        public PictureAdapter(Context context, File location) {
+            super(context, R.layout.add_button, location, new FileFilter() {
+                @Override
+                public boolean accept(File file) {
+                    return file.isFile();
+                }
+            });
+        }
+
+        @Override
+        protected View createFileView(int position, View view, ViewGroup parent) {
+            File file = getItem(position);
+
+            ViewHolder holder;
+
+            if (view == null ) {
+                LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                view = inflater.inflate(R.layout.folder_item, parent, false);
+                holder = new ViewHolder(view);
+                view.setTag(holder);
+            } else {
+                holder = (ViewHolder) view.getTag();
+            }
+
+            holder.title.setText(file.getName());
+
+            return view;
+        }
+
+
+        private class ViewHolder {
+            public TextView title;
+
+            public ViewHolder(View view) {
+                title = (TextView) view.findViewById(R.id.title);
+            }
+        }
     }
 
 }
