@@ -29,10 +29,13 @@ public class ImageComparator {
             if (files == null || files.length < 2) {
                 cancel(true);
                 return null;
+            } else {
+                fileA = files[0];
+                fileB = files[1];
             }
 
-            Bitmap a = BitmapFactory.decodeFile(files[0].getAbsolutePath());
-            Bitmap b = BitmapFactory.decodeFile(files[1].getAbsolutePath());
+            Bitmap a = BitmapFactory.decodeFile(fileA.getAbsolutePath());
+            Bitmap b = BitmapFactory.decodeFile(fileB.getAbsolutePath());
 
             int[][] sampleA = sampleImage(a);
             int[][] sampleB = sampleImage(b);
@@ -61,7 +64,7 @@ public class ImageComparator {
         }
 
         private int averageAround(Bitmap img, int px, int py) {
-            final int sampleRange = 3;
+            final int sampleRange = 15;
             float sampledPixels = 0;
             int red = 0;
             int green = 0;
