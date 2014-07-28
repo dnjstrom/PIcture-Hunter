@@ -19,6 +19,7 @@ import java.io.FileFilter;
 
 import se.nielstrom.picture_hunter.R;
 import se.nielstrom.picture_hunter.util.FileAdapter;
+import se.nielstrom.picture_hunter.util.ImageComparator;
 import se.nielstrom.picture_hunter.util.Storage;
 
 public class PhotoListFragment extends Fragment {
