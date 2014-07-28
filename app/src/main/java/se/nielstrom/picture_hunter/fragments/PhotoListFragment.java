@@ -57,7 +57,7 @@ public class PhotoListFragment extends Fragment {
     private class PictureAdapter extends FileAdapter {
 
         public PictureAdapter(Context context, File location) {
-            super(context, R.layout.add_button, location, new FileFilter() {
+            super(context, R.layout.add_picture, location, new FileFilter() {
                 @Override
                 public boolean accept(File file) {
                     return file.isFile();

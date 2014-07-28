@@ -75,7 +75,7 @@ public class AlbumListFragment extends Fragment implements AdapterView.OnItemCli
     private class AlbumAdapter extends FileAdapter {
 
         public AlbumAdapter(Context context, File location) {
-            super(context, R.layout.add_button, location, new FileFilter() {
+            super(context, R.layout.add_album, location, new FileFilter() {
                 @Override
                 public boolean accept(File file) {
                     return file.isDirectory();

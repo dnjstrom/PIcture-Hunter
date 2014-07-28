@@ -26,6 +26,7 @@ public abstract class FileAdapter extends ArrayAdapter<File> {
 
     private final FileObserver observer;
     private final int addButtonId;
+    private final FileFilter filter;
     private File location;
     private Context context;
 
@@ -35,10 +36,14 @@ public abstract class FileAdapter extends ArrayAdapter<File> {
             Bundle bundle = msg.getData();
             String path = bundle.getString(KEY_PATH);
 
-            if ((FileObserver.CREATE & msg.what) != 0 || (FileObserver.MOVED_TO & msg.what) != 0) {
-                add(new File(location.getAbsolutePath() + File.separator + path));
+            File file = new File(location, path);
+
+            if (!filter.accept(file)) {
+                return;
+            } else if ((FileObserver.CREATE & msg.what) != 0 || (FileObserver.MOVED_TO & msg.what) != 0) {
+                add(file);
             } else if ((FileObserver.DELETE & msg.what) != 0 || (FileObserver.MOVED_FROM & msg.what) != 0){
-                remove(new File(location.getAbsolutePath() + File.separator + path));
+                remove(file);
             }
 
             notifyDataSetChanged();
@@ -51,6 +56,7 @@ public abstract class FileAdapter extends ArrayAdapter<File> {
         this.context = context;
         this.addButtonId = addButtonId;
         this.location = location;
+        this.filter = filter;
 
         addAll(location.listFiles(filter));
 

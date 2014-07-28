@@ -66,7 +66,7 @@ public class AlbumListActivity extends FragmentActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void addItem(View button) {
+    public void addAlbum(View button) {
         File location = adapter.getFolder(pager.getCurrentItem());
         storage.createAlbumAt(location);
         //adapter.add();

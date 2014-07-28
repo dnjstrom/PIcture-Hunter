@@ -3,6 +3,9 @@ package se.nielstrom.picture_hunter.util;
 import android.os.Environment;
 
 import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * Created by Daniel on 2014-07-27.
@@ -57,14 +60,26 @@ public class Storage {
     public File createAlbumAt(File location) {
         String name = "New Album";
 
-        File album = new File(location.getAbsolutePath() + File.separator + name);
-
-        for (int i = 0; album.exists(); i++) {
-            album = new File(location.getAbsolutePath() + File.separator + name + " " + i);
-        }
+        File album = makeUnique(new File(location, name));
 
         album.mkdirs();
 
         return album;
+    }
+
+    public File createImageFileAt(File location) {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        File image = makeUnique(new File(location, timeStamp + ".jpg"));
+        return image;
+    }
+
+    private File makeUnique(File file) {
+        File unique = file;
+
+        for (int i = 0; unique.exists(); i++) {
+            unique = new File(file.getAbsolutePath() + " " + i);
+        }
+
+        return unique;
     }
 }
