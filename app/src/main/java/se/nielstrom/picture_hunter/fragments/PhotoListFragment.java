@@ -1,11 +1,16 @@
 package se.nielstrom.picture_hunter.fragments;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.TextView;
 
@@ -14,11 +19,14 @@ import java.io.FileFilter;
 
 import se.nielstrom.picture_hunter.R;
 import se.nielstrom.picture_hunter.util.FileAdapter;
+import se.nielstrom.picture_hunter.util.Storage;
 
 public class PhotoListFragment extends Fragment {
     private static final String KEY_PATH = "KEY_PATH";
     private String path;
     private File file;
+    private PictureAdapter adapter;
+    private Storage storage;
 
     public static Fragment newInstance(String absolutePath) {
         PhotoListFragment fragment = new PhotoListFragment();
@@ -30,6 +38,7 @@ public class PhotoListFragment extends Fragment {
 
     public PhotoListFragment() {
         // Required empty public constructor
+        storage = new Storage();
     }
 
     @Override
@@ -48,11 +57,42 @@ public class PhotoListFragment extends Fragment {
 
         GridView grid = (GridView) root.findViewById(R.id.photo_grid);
 
-        grid.setAdapter(new PictureAdapter(getActivity(), file));
+        adapter = new PictureAdapter(getActivity(), file);
+        adapter.setAddListener(new ClickListener());
+        grid.setAdapter(adapter);
+
+        grid.setOnItemClickListener(new ClickListener());
 
         return root;
     }
 
+
+    private class ClickListener implements AdapterView.OnItemClickListener, View.OnClickListener {
+
+        private static final int REQUEST_IMAGE_CAPTURE = 1;
+        private File latestPicture;
+
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+            Intent intent = new Intent();
+            intent.setAction(android.content.Intent.ACTION_VIEW);
+            File file = (File) adapterView.getItemAtPosition(position);
+            intent.setDataAndType(Uri.fromFile(file), "image/*");
+            startActivity(intent);
+        }
+
+        @Override
+        public void onClick(View view) {
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+            if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                latestPicture = storage.createImageFileAt(file);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(latestPicture));
+
+                startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+            }
+        }
+    }
 
     private class PictureAdapter extends FileAdapter {
 

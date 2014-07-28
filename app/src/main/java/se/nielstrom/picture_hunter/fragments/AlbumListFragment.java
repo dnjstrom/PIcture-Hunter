@@ -17,6 +17,7 @@ import java.io.FileFilter;
 import se.nielstrom.picture_hunter.PhotoListActivity;
 import se.nielstrom.picture_hunter.R;
 import se.nielstrom.picture_hunter.util.FileAdapter;
+import se.nielstrom.picture_hunter.util.Storage;
 
 
 public class AlbumListFragment extends Fragment implements AdapterView.OnItemClickListener {
@@ -24,6 +25,8 @@ public class AlbumListFragment extends Fragment implements AdapterView.OnItemCli
 
     private String path;
     private File file;
+    private AlbumAdapter adapter;
+    private Storage storage;
 
 
     public static AlbumListFragment newInstance(String path) {
@@ -36,6 +39,7 @@ public class AlbumListFragment extends Fragment implements AdapterView.OnItemCli
 
     public AlbumListFragment() {
         // Required empty public constructor
+        storage = new Storage();
     }
 
     @Override
@@ -54,21 +58,36 @@ public class AlbumListFragment extends Fragment implements AdapterView.OnItemCli
 
         GridView grid = (GridView) root.findViewById(R.id.album_grid);
 
-        grid.setAdapter(new AlbumAdapter(getActivity(), file));
+        adapter = new AlbumAdapter(getActivity(), file);
+        adapter.setAddListener(new ClickListener());
+        grid.setAdapter(adapter);
 
-        grid.setOnItemClickListener(this);
+        grid.setOnItemClickListener(new ClickListener());
 
         return root;
     }
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        Intent intent = new Intent(getActivity(), PhotoListActivity.class);
-        File file = (File) adapterView.getAdapter().getItem(i);
-        File parent = file.getParentFile();
-        intent.putExtra(PhotoListActivity.KEY_PATH, file.getParentFile().getAbsolutePath());
-        intent.putExtra(PhotoListActivity.KEY_POSITION, i);
-        startActivity(intent);
+
+    }
+
+    private class ClickListener implements AdapterView.OnItemClickListener, View.OnClickListener {
+
+        @Override
+        public void onClick(View view) {
+            storage.createAlbumAt(file);
+        }
+
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            Intent intent = new Intent(getActivity(), PhotoListActivity.class);
+            File file = (File) adapterView.getAdapter().getItem(i);
+            File parent = file.getParentFile();
+            intent.putExtra(PhotoListActivity.KEY_PATH, file.getParentFile().getAbsolutePath());
+            intent.putExtra(PhotoListActivity.KEY_POSITION, i);
+            startActivity(intent);
+        }
     }
 
 

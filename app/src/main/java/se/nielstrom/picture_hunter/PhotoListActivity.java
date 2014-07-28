@@ -28,15 +28,11 @@ public class PhotoListActivity extends FragmentActivity {
     private File file;
     private ViewPager pager;
     private FoldersPagerAdapter adapter;
-    private Storage storage;
-    private File latestPicture;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo_list);
-
-        storage = new Storage();
 
         Bundle extras = getIntent().getExtras();
         path = extras.getString(KEY_PATH);
@@ -75,22 +71,5 @@ public class PhotoListActivity extends FragmentActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    public void addPicture(View button) {
-        File location = adapter.getFolder(pager.getCurrentItem());
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            latestPicture = storage.createImageFileAt(location);
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(latestPicture));
-
-            startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
-        }
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.d(getClass().getSimpleName(), "Created: " + latestPicture.getAbsolutePath());
     }
 }

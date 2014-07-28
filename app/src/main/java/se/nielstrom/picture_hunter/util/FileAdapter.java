@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -16,7 +17,7 @@ import java.io.FileFilter;
 import se.nielstrom.picture_hunter.R;
 
 
-public abstract class FileAdapter extends ArrayAdapter<File> {
+public abstract class FileAdapter extends ArrayAdapter<File> implements View.OnClickListener {
     private static final int FILE_EVENTS = FileObserver.CREATE | FileObserver.DELETE | FileObserver.MOVED_FROM | FileObserver.MOVED_TO;
 
     private static final String BUTTON_TAG = FileAdapter.class + "_add_button";
@@ -49,6 +50,9 @@ public abstract class FileAdapter extends ArrayAdapter<File> {
             notifyDataSetChanged();
         }
     };
+
+    private View.OnClickListener listener;
+
 
     public FileAdapter(final Context context, int addButtonId, File location, FileFilter filter) {
         super(context, R.layout.folder_item);
@@ -86,10 +90,11 @@ public abstract class FileAdapter extends ArrayAdapter<File> {
 
     @Override
     public View getView(int i, View view, ViewGroup parent) {
-
         if (i == super.getCount()) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(addButtonId, parent, false);
+            Button button = (Button) view.findViewById(R.id.button_add);
+            button.setOnClickListener(this);
             view.setTag(BUTTON_TAG);
             return view;
         } else if (isButton(view)) {
@@ -101,8 +106,19 @@ public abstract class FileAdapter extends ArrayAdapter<File> {
 
     protected abstract View createFileView(int position, View view, ViewGroup parent);
 
-    public boolean isButton(View view) {
+    public static boolean isButton(View view) {
         return view != null && view.getTag() == BUTTON_TAG;
+    }
+
+    public void setAddListener(View.OnClickListener listener) {
+        this.listener = listener;
+    }
+
+    @Override
+    public void onClick(View view) {
+        if (listener != null) {
+            listener.onClick(view);
+        }
     }
 
 
@@ -123,4 +139,5 @@ public abstract class FileAdapter extends ArrayAdapter<File> {
             handler.sendMessage(msg);
         }
     }
+
 }
