@@ -15,9 +15,7 @@ import android.widget.RelativeLayout;
 
 import java.io.File;
 
-/**
- * Created by Daniel on 2014-07-29.
- */
+
 public class ThumbnailZoomer {
 
     private final ValueAnimator animation;

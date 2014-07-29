@@ -11,13 +11,13 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.File;
@@ -26,6 +26,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import se.nielstrom.picture_hunter.CameraActivity;
 import se.nielstrom.picture_hunter.R;
 import se.nielstrom.picture_hunter.util.FileAdapter;
 import se.nielstrom.picture_hunter.util.ImageLoaderTask;
@@ -54,6 +55,7 @@ public class PhotoListFragment extends Fragment {
 
     public PhotoListFragment() {
         // Required empty public constructor
+
     }
 
     @Override
@@ -219,7 +221,9 @@ public class PhotoListFragment extends Fragment {
             fullImageView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    fullImageView.setVisibility(View.INVISIBLE);
+                    Intent intent = new Intent(getActivity(), CameraActivity.class);
+                    startActivity(intent);
+                    getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
                 }
             });
 
