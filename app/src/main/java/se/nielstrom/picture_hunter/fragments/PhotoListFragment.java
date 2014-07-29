@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -16,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.io.File;
@@ -26,11 +28,16 @@ import java.io.IOException;
 
 import se.nielstrom.picture_hunter.R;
 import se.nielstrom.picture_hunter.util.FileAdapter;
+import se.nielstrom.picture_hunter.util.ImageLoaderTask;
 import se.nielstrom.picture_hunter.util.InteractionBehavior;
 import se.nielstrom.picture_hunter.util.Storage;
+import se.nielstrom.picture_hunter.util.ThumbnailZoomer;
 
 public class PhotoListFragment extends Fragment {
     private static final String KEY_PATH = "KEY_PATH";
+    private static final int IMAGE_SIZE = 512;
+    private static final int THUMB_SIZE = 384;
+
     private String path;
     private File file;
     private PictureAdapter adapter;
@@ -110,7 +117,7 @@ public class PhotoListFragment extends Fragment {
             }
 
             holder.title.setText(file.getName());
-            new ImageLoaderTask(holder.image).execute(file.getAbsolutePath());
+            new ImageLoaderTask(holder.image, THUMB_SIZE, THUMB_SIZE).execute(file.getAbsolutePath());
 
             return view;
         }
@@ -125,39 +132,10 @@ public class PhotoListFragment extends Fragment {
                 image = (ImageView) view.findViewById(R.id.image);
             }
         }
-
-        private class ImageLoaderTask extends AsyncTask<String, Void, Bitmap> {
-
-            private final ImageView thumbView;
-
-            public ImageLoaderTask(ImageView thumbView) {
-                this.thumbView = thumbView;
-            }
-
-            @Override
-            protected Bitmap doInBackground(String... strings) {
-                if (strings == null || strings.length != 1) {
-                    return null;
-                }
-
-                Bitmap bitmap = BitmapFactory.decodeFile(strings[0]);
-                Bitmap thumb = ThumbnailUtils.extractThumbnail(bitmap, 384, 384);
-
-                return thumb;
-            }
-
-            @Override
-            protected void onPostExecute(Bitmap thumb) {
-                thumbView.setImageBitmap(thumb);
-            }
-        }
     }
 
 
     private class UserFileBehavior extends InteractionBehavior {
-
-        private static final int REQUEST_IMAGE_CAPTURE = 1;
-
         public UserFileBehavior(Fragment fragment) {
             super(fragment);
         }
@@ -179,7 +157,7 @@ public class PhotoListFragment extends Fragment {
                 try {
                     tmpFile = storage.createTmpFile();
                     intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(tmpFile));
-                    startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+                    startActivityForResult(intent, 0);
                 } catch (IOException e) {}
             }
         }
@@ -192,7 +170,6 @@ public class PhotoListFragment extends Fragment {
         }
 
         new SavePictureTask().execute(tmpFile);
-
     }
 
 
@@ -200,7 +177,7 @@ public class PhotoListFragment extends Fragment {
         @Override
         protected Void doInBackground(File... files) {
             Bitmap bitmap = BitmapFactory.decodeFile(files[0].getAbsolutePath());
-            int size = Math.min(512, Math.min(bitmap.getWidth(), bitmap.getHeight()));
+            int size = Math.min(IMAGE_SIZE, Math.min(bitmap.getWidth(), bitmap.getHeight()));
             Bitmap small = ThumbnailUtils.extractThumbnail(bitmap, size, size);
 
             File imageFile = storage.createImageFileAt(file);
@@ -224,6 +201,30 @@ public class PhotoListFragment extends Fragment {
     private class ForeignFileBehavior extends InteractionBehavior {
         public ForeignFileBehavior(Fragment fragment) {
             super(fragment);
+        }
+
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+            ImageView thumbView = (ImageView) view.findViewById(R.id.image);
+            Bitmap thumb = ((BitmapDrawable)thumbView.getDrawable()).getBitmap();
+
+            final ImageView fullImageView = (ImageView) getView().findViewById(R.id.full_image);
+
+            fullImageView.setImageBitmap(thumb);
+            fullImageView.setVisibility(View.VISIBLE);
+
+            File file = (File) adapterView.getItemAtPosition(position);
+            new ImageLoaderTask(fullImageView).execute(file.getAbsolutePath());
+
+            fullImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    fullImageView.setVisibility(View.INVISIBLE);
+                }
+            });
+
+            new ThumbnailZoomer(thumbView, fullImageView, getResources().getInteger(
+                    android.R.integer.config_shortAnimTime)).zoom();
         }
     }
 }
