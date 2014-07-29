@@ -7,16 +7,14 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/**
- * Created by Daniel on 2014-07-27.
- */
+
 public class Storage {
     public static final String APP_FOLDER = Environment.getExternalStorageDirectory() + File.separator + "PictureHunter";
-    public static final String MY_ALBUMS = APP_FOLDER + File.separator + "MyAlbums";
-    public static final String OTHER_ALBUMS = APP_FOLDER + File.separator + "OtherAlbums";
+    public static final String USER_ALBUMS = APP_FOLDER + File.separator + "My Albums";
+    public static final String FOREIGN_ALBUMS = APP_FOLDER + File.separator + "Other Albums";
 
-    private File myAlbums;
-    private File otherAlbums;
+    private File userAlbums;
+    private File foreignAlbums;
 
     private boolean externalStorageExists;
     private File appFolder;
@@ -26,17 +24,17 @@ public class Storage {
 
         if (exists()){
             appFolder = getOrCreateFolder(APP_FOLDER);
-            myAlbums = getOrCreateFolder(MY_ALBUMS);
-            otherAlbums = getOrCreateFolder(OTHER_ALBUMS);
+            userAlbums = getOrCreateFolder(USER_ALBUMS);
+            foreignAlbums = getOrCreateFolder(FOREIGN_ALBUMS);
         }
     }
 
-    public File getMyAlbums() {
-        return myAlbums;
+    public File getUserAlbums() {
+        return userAlbums;
     }
 
-    public File getOtherAlbums() {
-        return otherAlbums;
+    public File getForeignAlbums() {
+        return foreignAlbums;
     }
 
     public boolean exists() {
@@ -81,5 +79,18 @@ public class Storage {
         }
 
         return unique;
+    }
+
+    public boolean isUserFile(File file) {
+        return inDirectory(file, userAlbums);
+    }
+
+    public boolean isForeignFile(File file) {
+        return inDirectory(file, foreignAlbums);
+    }
+
+    private boolean inDirectory(File file, File directory) {
+        boolean result = file.getAbsolutePath().contains(directory.getAbsolutePath());
+        return result;
     }
 }

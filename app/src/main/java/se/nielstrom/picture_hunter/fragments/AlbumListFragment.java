@@ -17,10 +17,11 @@ import java.io.FileFilter;
 import se.nielstrom.picture_hunter.PhotoListActivity;
 import se.nielstrom.picture_hunter.R;
 import se.nielstrom.picture_hunter.util.FileAdapter;
+import se.nielstrom.picture_hunter.util.InteractionBehavior;
 import se.nielstrom.picture_hunter.util.Storage;
 
 
-public class AlbumListFragment extends Fragment implements AdapterView.OnItemClickListener {
+public class AlbumListFragment extends Fragment {
     private static final String PATH = "path";
 
     private String path;
@@ -58,36 +59,20 @@ public class AlbumListFragment extends Fragment implements AdapterView.OnItemCli
 
         GridView grid = (GridView) root.findViewById(R.id.album_grid);
 
+        InteractionBehavior behavior;
+        if (storage.isUserFile(file)) {
+            behavior = new UserFileBehavior(this);
+        } else {
+            behavior = new ForeignFileBehavior(this);
+        }
+
         adapter = new AlbumAdapter(getActivity(), file);
-        adapter.setAddListener(new ClickListener());
+        adapter.setAddListener(behavior);
         grid.setAdapter(adapter);
 
-        grid.setOnItemClickListener(new ClickListener());
+        grid.setOnItemClickListener(behavior);
 
         return root;
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-    }
-
-    private class ClickListener implements AdapterView.OnItemClickListener, View.OnClickListener {
-
-        @Override
-        public void onClick(View view) {
-            storage.createAlbumAt(file);
-        }
-
-        @Override
-        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-            Intent intent = new Intent(getActivity(), PhotoListActivity.class);
-            File file = (File) adapterView.getAdapter().getItem(i);
-            File parent = file.getParentFile();
-            intent.putExtra(PhotoListActivity.KEY_PATH, file.getParentFile().getAbsolutePath());
-            intent.putExtra(PhotoListActivity.KEY_POSITION, i);
-            startActivity(intent);
-        }
     }
 
 
@@ -129,6 +114,36 @@ public class AlbumListFragment extends Fragment implements AdapterView.OnItemCli
             public ViewHolder(View view) {
                 title = (TextView) view.findViewById(R.id.title);
             }
+        }
+    }
+
+
+    private class UserFileBehavior extends InteractionBehavior {
+
+        public UserFileBehavior(Fragment fragment) {
+            super(fragment);
+        }
+
+        @Override
+        public void onClick(View view) {
+            storage.createAlbumAt(file);
+        }
+
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            Intent intent = new Intent(getActivity(), PhotoListActivity.class);
+            File file = (File) adapterView.getAdapter().getItem(i);
+            File parent = file.getParentFile();
+            intent.putExtra(PhotoListActivity.KEY_PATH, file.getParentFile().getAbsolutePath());
+            intent.putExtra(PhotoListActivity.KEY_POSITION, i);
+            startActivity(intent);
+        }
+    }
+
+
+    private class ForeignFileBehavior extends InteractionBehavior {
+        public ForeignFileBehavior(Fragment fragment) {
+            super(fragment);
         }
     }
 }
