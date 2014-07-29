@@ -59,15 +59,17 @@ public class AlbumListFragment extends Fragment {
 
         GridView grid = (GridView) root.findViewById(R.id.album_grid);
 
+        adapter = new AlbumAdapter(getActivity(), file);
         InteractionBehavior behavior;
+
         if (storage.isUserFile(file)) {
             behavior = new UserFileBehavior(this);
+            adapter.setAddListener(behavior);
         } else {
             behavior = new ForeignFileBehavior(this);
+            adapter.setShowAddButton(false);
         }
 
-        adapter = new AlbumAdapter(getActivity(), file);
-        adapter.setAddListener(behavior);
         grid.setAdapter(adapter);
 
         grid.setOnItemClickListener(behavior);
@@ -118,6 +120,13 @@ public class AlbumListFragment extends Fragment {
     }
 
 
+    private void enterAlbum(File album, int position) {
+        Intent intent = new Intent(getActivity(), PhotoListActivity.class);
+        intent.putExtra(PhotoListActivity.KEY_PATH, album.getAbsolutePath());
+        intent.putExtra(PhotoListActivity.KEY_POSITION, position);
+        startActivity(intent);
+    }
+
     private class UserFileBehavior extends InteractionBehavior {
 
         public UserFileBehavior(Fragment fragment) {
@@ -131,12 +140,8 @@ public class AlbumListFragment extends Fragment {
 
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-            Intent intent = new Intent(getActivity(), PhotoListActivity.class);
             File file = (File) adapterView.getAdapter().getItem(i);
-            File parent = file.getParentFile();
-            intent.putExtra(PhotoListActivity.KEY_PATH, file.getParentFile().getAbsolutePath());
-            intent.putExtra(PhotoListActivity.KEY_POSITION, i);
-            startActivity(intent);
+            enterAlbum(file.getParentFile(), i);
         }
     }
 
@@ -144,6 +149,12 @@ public class AlbumListFragment extends Fragment {
     private class ForeignFileBehavior extends InteractionBehavior {
         public ForeignFileBehavior(Fragment fragment) {
             super(fragment);
+        }
+
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            File file = (File) adapterView.getAdapter().getItem(i);
+            enterAlbum(file.getParentFile(), i);
         }
     }
 }

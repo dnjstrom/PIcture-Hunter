@@ -31,6 +31,8 @@ public abstract class FileAdapter extends ArrayAdapter<File> implements View.OnC
     private File location;
     private Context context;
 
+    private boolean showAddButton = true;
+
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -70,13 +72,13 @@ public abstract class FileAdapter extends ArrayAdapter<File> implements View.OnC
 
     @Override
     public int getCount() {
-        return super.getCount() + 1;
+        return (showAddButton) ? super.getCount() + 1 : super.getCount();
     }
 
 
     @Override
     public File getItem(int position) {
-        if (position == super.getCount()) {
+        if (showAddButton && position == super.getCount()) {
             return null;
         } else {
             return super.getItem(position);
@@ -90,7 +92,7 @@ public abstract class FileAdapter extends ArrayAdapter<File> implements View.OnC
 
     @Override
     public View getView(int i, View view, ViewGroup parent) {
-        if (i == super.getCount()) {
+        if (showAddButton && i == super.getCount()) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(addButtonId, parent, false);
             Button button = (Button) view.findViewById(R.id.button_add);
@@ -116,8 +118,15 @@ public abstract class FileAdapter extends ArrayAdapter<File> implements View.OnC
 
     @Override
     public void onClick(View view) {
-        if (listener != null) {
+        if (showAddButton && listener != null) {
             listener.onClick(view);
+        }
+    }
+
+    public void setShowAddButton(boolean show) {
+        if (show != showAddButton) {
+            showAddButton = show;
+            notifyDataSetChanged();
         }
     }
 
