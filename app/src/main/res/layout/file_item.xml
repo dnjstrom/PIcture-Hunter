@@ -8,16 +8,33 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">
 
-        <TextView
-            android:id="@+id/title"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:gravity="center"
-            android:text="File Item"
-            android:textSize="20sp"
-            />
 
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent">
+
+            <ImageView
+                android:id="@+id/image"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:src="@drawable/ic_action_picture"
+                />
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="File Item"
+                android:textSize="20sp"
+                android:padding="10dp"
+                android:layout_alignParentBottom="true"
+                android:background="#CC000000"
+                />
+        </RelativeLayout>
 
     </se.nielstrom.picture_hunter.views.SquareView>
+
+
 
 </LinearLayout>

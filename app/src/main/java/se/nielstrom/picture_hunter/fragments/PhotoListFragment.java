@@ -2,7 +2,11 @@ package se.nielstrom.picture_hunter.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
@@ -11,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.File;
@@ -93,7 +98,7 @@ public class PhotoListFragment extends Fragment {
 
             if (view == null ) {
                 LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                view = inflater.inflate(R.layout.folder_item, parent, false);
+                view = inflater.inflate(R.layout.file_item, parent, false);
                 holder = new ViewHolder(view);
                 view.setTag(holder);
             } else {
@@ -101,6 +106,7 @@ public class PhotoListFragment extends Fragment {
             }
 
             holder.title.setText(file.getName());
+            new ImageLoaderTask(holder.image).execute(file.getAbsolutePath());
 
             return view;
         }
@@ -108,9 +114,37 @@ public class PhotoListFragment extends Fragment {
 
         private class ViewHolder {
             public TextView title;
+            public ImageView image;
 
             public ViewHolder(View view) {
                 title = (TextView) view.findViewById(R.id.title);
+                image = (ImageView) view.findViewById(R.id.image);
+            }
+        }
+
+        private class ImageLoaderTask extends AsyncTask<String, Void, Bitmap> {
+
+            private final ImageView thumbView;
+
+            public ImageLoaderTask(ImageView thumbView) {
+                this.thumbView = thumbView;
+            }
+
+            @Override
+            protected Bitmap doInBackground(String... strings) {
+                if (strings == null || strings.length != 1) {
+                    return null;
+                }
+
+                Bitmap bitmap = BitmapFactory.decodeFile(strings[0]);
+                Bitmap thumb = ThumbnailUtils.extractThumbnail(bitmap, 384, 384);
+
+                return thumb;
+            }
+
+            @Override
+            protected void onPostExecute(Bitmap thumb) {
+                thumbView.setImageBitmap(thumb);
             }
         }
     }

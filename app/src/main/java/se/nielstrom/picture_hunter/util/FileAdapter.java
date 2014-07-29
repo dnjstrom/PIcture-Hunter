@@ -39,6 +39,10 @@ public abstract class FileAdapter extends ArrayAdapter<File> implements View.OnC
             Bundle bundle = msg.getData();
             String path = bundle.getString(KEY_PATH);
 
+            if (path == null) {
+                return;
+            }
+
             File file = new File(location, path);
 
             if (!filter.accept(file)) {
