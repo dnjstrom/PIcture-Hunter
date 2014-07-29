@@ -20,6 +20,9 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 import se.nielstrom.picture_hunter.R;
 import se.nielstrom.picture_hunter.util.FileAdapter;
@@ -32,6 +35,7 @@ public class PhotoListFragment extends Fragment {
     private File file;
     private PictureAdapter adapter;
     private Storage storage;
+    private File tmpFile;
 
     public static Fragment newInstance(String absolutePath) {
         PhotoListFragment fragment = new PhotoListFragment();
@@ -43,7 +47,6 @@ public class PhotoListFragment extends Fragment {
 
     public PhotoListFragment() {
         // Required empty public constructor
-        storage = new Storage();
     }
 
     @Override
@@ -53,6 +56,7 @@ public class PhotoListFragment extends Fragment {
             path = getArguments().getString(KEY_PATH);
             file = new File(path);
         }
+        storage = new Storage(getActivity());
     }
 
     @Override
@@ -153,7 +157,6 @@ public class PhotoListFragment extends Fragment {
     private class UserFileBehavior extends InteractionBehavior {
 
         private static final int REQUEST_IMAGE_CAPTURE = 1;
-        private File latestPicture;
 
         public UserFileBehavior(Fragment fragment) {
             super(fragment);
@@ -173,11 +176,47 @@ public class PhotoListFragment extends Fragment {
             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
             if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
-                latestPicture = storage.createImageFileAt(file);
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(latestPicture));
-
-                startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+                try {
+                    tmpFile = storage.createTmpFile();
+                    intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(tmpFile));
+                    startActivityForResult(intent, REQUEST_IMAGE_CAPTURE);
+                } catch (IOException e) {}
             }
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (tmpFile == null || !tmpFile.exists()) {
+            return;
+        }
+
+        new SavePictureTask().execute(tmpFile);
+
+    }
+
+
+    private class SavePictureTask extends AsyncTask<File, Void, Void> {
+        @Override
+        protected Void doInBackground(File... files) {
+            Bitmap bitmap = BitmapFactory.decodeFile(files[0].getAbsolutePath());
+            int size = Math.min(512, Math.min(bitmap.getWidth(), bitmap.getHeight()));
+            Bitmap small = ThumbnailUtils.extractThumbnail(bitmap, size, size);
+
+            File imageFile = storage.createImageFileAt(file);
+            try {
+                FileOutputStream fout = new FileOutputStream(imageFile);
+                small.compress(Bitmap.CompressFormat.JPEG, 90, fout);
+                fout.flush();
+                fout.close();
+                tmpFile.delete();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            return null;
         }
     }
 

@@ -40,7 +40,6 @@ public class AlbumListFragment extends Fragment {
 
     public AlbumListFragment() {
         // Required empty public constructor
-        storage = new Storage();
     }
 
     @Override
@@ -50,6 +49,7 @@ public class AlbumListFragment extends Fragment {
             path = getArguments().getString(PATH);
             file = new File(path);
         }
+        storage = new Storage(getActivity());
     }
 
     @Override

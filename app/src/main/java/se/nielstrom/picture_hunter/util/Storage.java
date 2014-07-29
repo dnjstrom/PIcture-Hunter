@@ -1,5 +1,6 @@
 package se.nielstrom.picture_hunter.util;
 
+import android.content.Context;
 import android.os.Environment;
 
 import java.io.File;
@@ -12,6 +13,8 @@ public class Storage {
     public static final String APP_FOLDER = Environment.getExternalStorageDirectory() + File.separator + "PictureHunter";
     public static final String USER_ALBUMS = APP_FOLDER + File.separator + "My Albums";
     public static final String FOREIGN_ALBUMS = APP_FOLDER + File.separator + "Other Albums";
+    private final Context context;
+    private final File dataDir;
 
     private File userAlbums;
     private File foreignAlbums;
@@ -19,8 +22,10 @@ public class Storage {
     private boolean externalStorageExists;
     private File appFolder;
 
-    public Storage() {
+    public Storage(Context context) {
         externalStorageExists = Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
+        this.context = context;
+        dataDir  = new File(context.getApplicationInfo().dataDir);
 
         if (exists()){
             appFolder = getOrCreateFolder(APP_FOLDER);
@@ -66,9 +71,11 @@ public class Storage {
     }
 
     public File createImageFileAt(File location) {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        File image = makeUnique(new File(location, timeStamp + ".jpg"));
-        return image;
+        return makeUnique(new File(location, createTimeStamp() + ".jpg"));
+    }
+
+    public File createTmpFile() throws IOException {
+        return File.createTempFile(createTimeStamp(), ".jpg", appFolder);
     }
 
     private File makeUnique(File file) {
@@ -79,6 +86,10 @@ public class Storage {
         }
 
         return unique;
+    }
+
+    private String createTimeStamp() {
+        return new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
     }
 
     public boolean isUserFile(File file) {
