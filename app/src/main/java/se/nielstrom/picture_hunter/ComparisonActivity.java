@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +27,8 @@ public class ComparisonActivity extends FragmentActivity implements CameraFragme
     private LocationFinder locationFinder;
     private Storage storage;
     private File tmpFile;
+    private DetailViewFragment detailsFragment;
+    private CameraFragment cameraFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,9 +41,11 @@ public class ComparisonActivity extends FragmentActivity implements CameraFragme
         reference_path = extras.getString(KEY_REF_IMAGE_PATH);
         referenceFile = new File(reference_path);
 
+        detailsFragment = DetailViewFragment.newInstance(reference_path);
+
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.container, DetailViewFragment.newInstance(reference_path))
+                .replace(R.id.container, detailsFragment)
                 .commit();
 
         showingDetails = true;
@@ -90,13 +95,13 @@ public class ComparisonActivity extends FragmentActivity implements CameraFragme
 
             try {
                 tmpFile = storage.createTmpFile();
-                CameraFragment fragment = CameraFragment.newInstance(tmpFile.getAbsolutePath());
-                fragment.setOnPictureTakenListener(this);
+                cameraFragment = CameraFragment.newInstance(tmpFile.getAbsolutePath());
+                cameraFragment.setOnPictureTakenListener(this);
 
                 getSupportFragmentManager()
                         .beginTransaction()
-                        .setCustomAnimations(R.anim.from_middle, R.anim.to_middle, R.anim.from_middle, R.anim.to_middle)
-                        .replace(R.id.container, fragment)
+                        .setCustomAnimations(R.anim.from_middle, R.anim.to_middle)
+                        .replace(R.id.container, cameraFragment)
                         .addToBackStack(null)
                         .commit();
             } catch (IOException e) {
@@ -115,13 +120,22 @@ public class ComparisonActivity extends FragmentActivity implements CameraFragme
         new ImageComparator().compare(referenceFile, picture, new ImageComparator.ResultCallback() {
             @Override
             public void onComparisonResult(File a, File b, double distance) {
-                Log.d(getClass().getSimpleName(), "Distance: " + distance);
+                Toast.makeText(ComparisonActivity.this, "Distance: " + distance, Toast.LENGTH_LONG).show();
 
                 if (tmpFile != null) {
                     tmpFile.delete();
                 }
 
-                flipCard();
+                getSupportFragmentManager().popBackStack();
+
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .setCustomAnimations(R.anim.shake, R.anim.vanish)
+                        .replace(R.id.container, detailsFragment)
+                        .commit();
+
+
+                detailsFragment.showFailure();
             }
         });
     }

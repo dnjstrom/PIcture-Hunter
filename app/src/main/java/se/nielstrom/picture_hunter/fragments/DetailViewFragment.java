@@ -5,6 +5,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
@@ -20,6 +22,7 @@ public class DetailViewFragment extends Fragment {
     private static final String KEY_IMAGE_PATH = "KEY_REF_IMAGE_PATH";
     private String path;
     private File image;
+    private ImageView imgView;
 
     public static DetailViewFragment newInstance(String image_path) {
         DetailViewFragment fragment = new DetailViewFragment();
@@ -46,15 +49,26 @@ public class DetailViewFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View root = inflater.inflate(R.layout.fragment_detail_view, container, false);
 
-        ImageView imgView = (ImageView) root.findViewById(R.id.image);
+        imgView = (ImageView) root.findViewById(R.id.image);
         final ProgressBar progress = (ProgressBar) root.findViewById(R.id.progress);
         progress.setVisibility(View.VISIBLE);
+
         new ImageLoaderTask(imgView).setAsyncTaskListener(new AsyncTaskListener() {
             @Override
             public void onTaskComplete() {
                 progress.setVisibility(View.INVISIBLE);
             }
         }).execute(path);
+
         return root;
+    }
+
+    public void showFailure() {
+        Animation shake = AnimationUtils.loadAnimation(getActivity(), R.anim.shake);
+        imgView.startAnimation(shake);
+    }
+
+    public void showSuccess() {
+
     }
 }
