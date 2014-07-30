@@ -50,7 +50,7 @@ public class ImageLoaderTask extends AsyncTask<String, Void, Bitmap> {
         }
     }
 
-    public AsyncTask<String, Void, Bitmap> setAsyncTaskListener(AsyncTaskListener listener) {
+    public ImageLoaderTask setAsyncTaskListener(AsyncTaskListener listener) {
         this.listener = listener;
         return this;
     }

@@ -67,7 +67,7 @@ public class PhotoListFragment extends Fragment {
             path = getArguments().getString(KEY_PATH);
             file = new File(path);
         }
-        storage = new Storage(getActivity());
+        storage = new Storage();
     }
 
     @Override

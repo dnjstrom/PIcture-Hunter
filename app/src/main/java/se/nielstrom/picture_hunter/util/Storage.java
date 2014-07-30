@@ -13,8 +13,6 @@ public class Storage {
     public static final String APP_FOLDER = Environment.getExternalStorageDirectory() + File.separator + "PictureHunter";
     public static final String USER_ALBUMS = APP_FOLDER + File.separator + "My Albums";
     public static final String FOREIGN_ALBUMS = APP_FOLDER + File.separator + "Other Albums";
-    private final Context context;
-    private final File dataDir;
 
     private File userAlbums;
     private File foreignAlbums;
@@ -22,10 +20,8 @@ public class Storage {
     private boolean externalStorageExists;
     private File appFolder;
 
-    public Storage(Context context) {
+    public Storage() {
         externalStorageExists = Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
-        this.context = context;
-        dataDir  = new File(context.getApplicationInfo().dataDir);
 
         if (exists()){
             appFolder = getOrCreateFolder(APP_FOLDER);

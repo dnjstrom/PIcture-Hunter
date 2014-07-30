@@ -71,7 +71,7 @@ public class ComparisonActivity extends FragmentActivity {
                     .beginTransaction()
                     //.setCustomAnimations(R.anim.to_middle, R.anim.from_middle)
                     .setCustomAnimations(R.anim.from_middle, R.anim.to_middle, R.anim.from_middle, R.anim.to_middle)
-                    .replace(R.id.container, new CameraFragment())
+                    .replace(R.id.container, CameraFragment.newInstance(path))
                     .addToBackStack(null)
                     .commit();
         } else {

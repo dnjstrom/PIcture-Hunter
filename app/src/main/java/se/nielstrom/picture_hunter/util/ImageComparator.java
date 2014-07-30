@@ -7,6 +7,8 @@ import android.os.AsyncTask;
 
 import java.io.File;
 
+import se.nielstrom.picture_hunter.fragments.CameraFragment;
+
 
 public class ImageComparator {
 

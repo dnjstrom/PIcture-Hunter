@@ -26,7 +26,7 @@ public class AlbumListActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album_list);
 
-        storage = new Storage(this);
+        storage = new Storage();
 
         if (!storage.exists()) {
             Toast.makeText(this, "The app requires an external storage to be present.", Toast.LENGTH_LONG).show();
