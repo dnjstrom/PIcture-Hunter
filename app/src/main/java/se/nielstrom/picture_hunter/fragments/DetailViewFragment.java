@@ -17,7 +17,7 @@ import se.nielstrom.picture_hunter.util.ImageLoaderTask;
 
 public class DetailViewFragment extends Fragment {
 
-    private static final String KEY_IMAGE_PATH = "KEY_IMAGE_PATH";
+    private static final String KEY_IMAGE_PATH = "KEY_REF_IMAGE_PATH";
     private String path;
     private File image;
 

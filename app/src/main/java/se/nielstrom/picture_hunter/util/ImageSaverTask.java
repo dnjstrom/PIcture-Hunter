@@ -11,22 +11,38 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 
 
-public class ImageSaverTask extends AsyncTask<byte[], Void, Bitmap> {
+public class ImageSaverTask extends AsyncTask<Void, Void, Void> {
     private static final int IMAGE_SIZE = 1024;
-    private final File file;
+    private File sourceFile;
+    private File destination;
+    private byte[] sourceBytes;
     private AsyncTaskListener listener;
     private boolean includeLocation;
 
-    public ImageSaverTask(File file) {
-        this.file = file;
+    public ImageSaverTask(File source, File destination) {
+        this.sourceFile = source;
+        this.destination = destination;
+    }
+
+    public ImageSaverTask(byte[] source, File destination) {
+        this.sourceBytes = source;
+        this.destination = destination;
     }
 
     @Override
-    protected Bitmap doInBackground(byte[]... bytes) {
-        Bitmap bitmap = BitmapFactory.decodeByteArray(bytes[0], 0, bytes[0].length);
+    protected Void doInBackground(Void... voids) {
+        Bitmap bitmap;
+
+        if (sourceFile != null) {
+            bitmap = BitmapFactory.decodeFile(sourceFile.getAbsolutePath());
+        } else {
+            bitmap = BitmapFactory.decodeByteArray(sourceBytes, 0, sourceBytes.length);
+        }
+
         bitmap = ThumbnailUtils.extractThumbnail(bitmap, IMAGE_SIZE, IMAGE_SIZE);
+
         try {
-            FileOutputStream fout = new FileOutputStream(file);
+            FileOutputStream fout = new FileOutputStream(destination);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fout);
             fout.flush();
             fout.close();
@@ -34,12 +50,11 @@ public class ImageSaverTask extends AsyncTask<byte[], Void, Bitmap> {
         } catch (IOException e) {
         }
 
-
-        return bitmap;
+        return null;
     }
 
     @Override
-    protected void onPostExecute(Bitmap thumb) {
+    protected void onPostExecute(Void v) {
         if (listener != null) {
             listener.onTaskComplete();
         }

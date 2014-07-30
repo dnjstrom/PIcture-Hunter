@@ -2,17 +2,10 @@ package se.nielstrom.picture_hunter.fragments;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,20 +16,18 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 import se.nielstrom.picture_hunter.ComparisonActivity;
 import se.nielstrom.picture_hunter.R;
 import se.nielstrom.picture_hunter.util.FileAdapter;
 import se.nielstrom.picture_hunter.util.ImageLoaderTask;
+import se.nielstrom.picture_hunter.util.ImageSaverTask;
 import se.nielstrom.picture_hunter.util.InteractionBehavior;
 import se.nielstrom.picture_hunter.util.Storage;
-import se.nielstrom.picture_hunter.util.ThumbnailZoomer;
 
 public class PhotoListFragment extends Fragment {
-    private static final String KEY_PATH = "KEY_IMAGE_PATH";
+    private static final String KEY_PATH = "KEY_REF_IMAGE_PATH";
     private static final int IMAGE_SIZE = 512;
     private static final int THUMB_SIZE = 384;
 
@@ -57,7 +48,6 @@ public class PhotoListFragment extends Fragment {
 
     public PhotoListFragment() {
         // Required empty public constructor
-
     }
 
     @Override
@@ -172,32 +162,8 @@ public class PhotoListFragment extends Fragment {
             return;
         }
 
-        new SavePictureTask().execute(tmpFile);
-    }
-
-
-    private class SavePictureTask extends AsyncTask<File, Void, Void> {
-        @Override
-        protected Void doInBackground(File... files) {
-            Bitmap bitmap = BitmapFactory.decodeFile(files[0].getAbsolutePath());
-            int size = Math.min(IMAGE_SIZE, Math.min(bitmap.getWidth(), bitmap.getHeight()));
-            Bitmap small = ThumbnailUtils.extractThumbnail(bitmap, size, size);
-
-            File imageFile = storage.createImageFileAt(file);
-            try {
-                FileOutputStream fout = new FileOutputStream(imageFile);
-                small.compress(Bitmap.CompressFormat.JPEG, 90, fout);
-                fout.flush();
-                fout.close();
-                tmpFile.delete();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
+        File imageFile = storage.createImageFileAt(file);
+        new ImageSaverTask(tmpFile, imageFile);
     }
 
 
@@ -212,35 +178,8 @@ public class PhotoListFragment extends Fragment {
             File file = (File) adapterView.getItemAtPosition(position);
 
             Intent intent = new Intent(getActivity(), ComparisonActivity.class);
-            intent.putExtra(ComparisonActivity.KEY_IMAGE_PATH, file.getAbsolutePath());
+            intent.putExtra(ComparisonActivity.KEY_REF_IMAGE_PATH, file.getAbsolutePath());
             startActivity(intent);
-
-
-
-            /*
-            ImageView thumbView = (ImageView) view.findViewById(R.id.image);
-            Bitmap thumb = ((BitmapDrawable)thumbView.getDrawable()).getBitmap();
-
-            final ImageView fullImageView = (ImageView) getView().findViewById(R.id.full_image);
-
-            fullImageView.setImageBitmap(thumb);
-            fullImageView.setVisibility(View.VISIBLE);
-
-            File file = (File) adapterView.getItemAtPosition(position);
-            new ImageLoaderTask(fullImageView).execute(file.getAbsolutePath());
-
-            fullImageView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Intent intent = new Intent(getActivity(), CameraActivity.class);
-                    startActivity(intent);
-                    getActivity().overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
-                }
-            });
-
-            new ThumbnailZoomer(thumbView, fullImageView, getResources().getInteger(
-                    android.R.integer.config_shortAnimTime)).zoom();
-            */
         }
     }
 }

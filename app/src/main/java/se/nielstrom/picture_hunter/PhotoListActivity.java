@@ -20,7 +20,7 @@ import se.nielstrom.picture_hunter.util.FoldersPagerAdapter;
 
 public class PhotoListActivity extends FragmentActivity {
 
-    public static final String KEY_PATH = "KEY_IMAGE_PATH";
+    public static final String KEY_PATH = "KEY_REF_IMAGE_PATH";
     public static final String KEY_POSITION = "KEY_POSITION";
 
     private String path;

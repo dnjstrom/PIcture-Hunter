@@ -23,7 +23,7 @@ public abstract class FileAdapter extends ArrayAdapter<File> implements View.OnC
     private static final String BUTTON_TAG = FileAdapter.class + "_add_button";
 
     private static final int DATA_CHANGED = 0;
-    private static final String KEY_PATH = "KEY_IMAGE_PATH";
+    private static final String KEY_PATH = "KEY_REF_IMAGE_PATH";
 
     private final FileObserver observer;
     private final int addButtonId;
