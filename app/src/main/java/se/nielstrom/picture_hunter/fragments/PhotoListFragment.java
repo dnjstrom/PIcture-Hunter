@@ -144,26 +144,14 @@ public class PhotoListFragment extends Fragment {
 
         @Override
         public void onClick(View view) {
-            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-            if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
-                try {
-                    tmpFile = storage.createTmpFile();
-                    intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(tmpFile));
-                    startActivityForResult(intent, 0);
-                } catch (IOException e) {}
-            }
+            File image = storage.createImageFileAt(file);
+            CameraFragment fragment = CameraFragment.newInstance(image.getAbsolutePath());
+            getFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.grid_layout, fragment)
+                    .addToBackStack(null)
+                    .commit();
         }
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (tmpFile == null || !tmpFile.exists()) {
-            return;
-        }
-
-        File imageFile = storage.createImageFileAt(file);
-        new ImageSaverTask(tmpFile, imageFile);
     }
 
 
