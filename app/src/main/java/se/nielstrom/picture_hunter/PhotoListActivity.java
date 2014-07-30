@@ -17,13 +17,11 @@ import java.io.File;
 
 import se.nielstrom.picture_hunter.fragments.PhotoListFragment;
 import se.nielstrom.picture_hunter.util.FoldersPagerAdapter;
-import se.nielstrom.picture_hunter.util.Storage;
 
 public class PhotoListActivity extends FragmentActivity {
 
-    public static final String KEY_PATH = "KEY_PATH";
+    public static final String KEY_PATH = "KEY_IMAGE_PATH";
     public static final String KEY_POSITION = "KEY_POSITION";
-    private static final int REQUEST_IMAGE_CAPTURE = 1;
 
     private String path;
     private File file;

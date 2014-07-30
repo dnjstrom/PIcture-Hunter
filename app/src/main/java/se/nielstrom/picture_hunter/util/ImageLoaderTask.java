@@ -12,6 +12,7 @@ public class ImageLoaderTask extends AsyncTask<String, Void, Bitmap> {
     private boolean extractThumbnail;
     private int height;
     private int width;
+    private AsyncTaskListener listener;
 
     public ImageLoaderTask(ImageView thumbView) {
         this.thumbView = thumbView;
@@ -43,5 +44,14 @@ public class ImageLoaderTask extends AsyncTask<String, Void, Bitmap> {
     @Override
     protected void onPostExecute(Bitmap thumb) {
         thumbView.setImageBitmap(thumb);
+
+        if (listener != null) {
+            listener.onTaskComplete();
+        }
+    }
+
+    public AsyncTask<String, Void, Bitmap> setAsyncTaskListener(AsyncTaskListener listener) {
+        this.listener = listener;
+        return this;
     }
 }

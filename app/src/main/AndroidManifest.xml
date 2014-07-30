@@ -30,6 +30,10 @@
             android:name=".CameraActivity"
             android:label="@string/title_activity_camera" >
         </activity>
+        <activity
+            android:name=".ComparisonActivity"
+            android:label="@string/title_activity_comparison" >
+        </activity>
     </application>
 
 </manifest>

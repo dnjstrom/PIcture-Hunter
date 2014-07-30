@@ -11,6 +11,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,7 +27,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import se.nielstrom.picture_hunter.CameraActivity;
+import se.nielstrom.picture_hunter.ComparisonActivity;
 import se.nielstrom.picture_hunter.R;
 import se.nielstrom.picture_hunter.util.FileAdapter;
 import se.nielstrom.picture_hunter.util.ImageLoaderTask;
@@ -35,7 +36,7 @@ import se.nielstrom.picture_hunter.util.Storage;
 import se.nielstrom.picture_hunter.util.ThumbnailZoomer;
 
 public class PhotoListFragment extends Fragment {
-    private static final String KEY_PATH = "KEY_PATH";
+    private static final String KEY_PATH = "KEY_IMAGE_PATH";
     private static final int IMAGE_SIZE = 512;
     private static final int THUMB_SIZE = 384;
 
@@ -44,6 +45,7 @@ public class PhotoListFragment extends Fragment {
     private PictureAdapter adapter;
     private Storage storage;
     private File tmpFile;
+    InteractionBehavior behavior;
 
     public static Fragment newInstance(String absolutePath) {
         PhotoListFragment fragment = new PhotoListFragment();
@@ -75,7 +77,6 @@ public class PhotoListFragment extends Fragment {
 
         GridView grid = (GridView) root.findViewById(R.id.photo_grid);
 
-        InteractionBehavior behavior;
         if (storage.isUserFile(file)) {
             behavior = new UserFileBehavior(this);
         } else {
@@ -207,6 +208,16 @@ public class PhotoListFragment extends Fragment {
 
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+
+            File file = (File) adapterView.getItemAtPosition(position);
+
+            Intent intent = new Intent(getActivity(), ComparisonActivity.class);
+            intent.putExtra(ComparisonActivity.KEY_IMAGE_PATH, file.getAbsolutePath());
+            startActivity(intent);
+
+
+
+            /*
             ImageView thumbView = (ImageView) view.findViewById(R.id.image);
             Bitmap thumb = ((BitmapDrawable)thumbView.getDrawable()).getBitmap();
 
@@ -229,6 +240,7 @@ public class PhotoListFragment extends Fragment {
 
             new ThumbnailZoomer(thumbView, fullImageView, getResources().getInteger(
                     android.R.integer.config_shortAnimTime)).zoom();
+            */
         }
     }
 }
