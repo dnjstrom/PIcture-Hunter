@@ -42,8 +42,9 @@ public class PhotoListFragment extends Fragment implements NfcAdapter.CreateNdef
     private File tmpFile;
     InteractionBehavior behavior;
     private NfcAdapter nfcAdapter;
+    private GridView grid;
 
-    public static Fragment newInstance(String absolutePath) {
+    public static PhotoListFragment newInstance(String absolutePath) {
         PhotoListFragment fragment = new PhotoListFragment();
         Bundle args = new Bundle();
         args.putString(KEY_PATH, absolutePath);
@@ -70,18 +71,10 @@ public class PhotoListFragment extends Fragment implements NfcAdapter.CreateNdef
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_photo_grid, container, false);
 
-        GridView grid = (GridView) root.findViewById(R.id.photo_grid);
-
-        if (storage.isUserFile(file)) {
-            behavior = new UserFileBehavior(this);
-        } else {
-            behavior = new ForeignFileBehavior(this);
-        }
+        grid = (GridView) root.findViewById(R.id.photo_grid);
 
         adapter = new PictureAdapter(getActivity(), file);
-        adapter.setAddListener(behavior);
         grid.setAdapter(adapter);
-        grid.setOnItemClickListener(behavior);
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(getActivity());
         if (nfcAdapter == null) {
@@ -90,7 +83,22 @@ public class PhotoListFragment extends Fragment implements NfcAdapter.CreateNdef
             nfcAdapter.setNdefPushMessageCallback(this, getActivity());
         }
 
+        setBehaviorDeffered(behavior);
+
         return root;
+    }
+
+    private void setBehaviorDeffered(InteractionBehavior behavior) {
+        adapter.setAddListener(behavior);
+        grid.setOnItemClickListener(behavior);
+        //grid.setOnItemLongClickListener(behavior);
+        //grid.setOnItemSelectedListener(behavior);
+        grid.setMultiChoiceModeListener(behavior);
+    }
+
+    public PhotoListFragment setBehavior(InteractionBehavior behavior) {
+        this.behavior = behavior;
+        return this;
     }
 
     @Override
@@ -141,50 +149,6 @@ public class PhotoListFragment extends Fragment implements NfcAdapter.CreateNdef
                 title = (TextView) view.findViewById(R.id.title);
                 image = (ImageView) view.findViewById(R.id.image);
             }
-        }
-    }
-
-
-    private class UserFileBehavior extends InteractionBehavior {
-        public UserFileBehavior(Fragment fragment) {
-            super(fragment);
-        }
-
-        @Override
-        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-            Intent intent = new Intent();
-            intent.setAction(android.content.Intent.ACTION_VIEW);
-            File file = (File) adapterView.getItemAtPosition(position);
-            intent.setDataAndType(Uri.fromFile(file), "image/*");
-            startActivity(intent);
-        }
-
-        @Override
-        public void onClick(View view) {
-            File image = storage.createImageFileAt(file);
-            CameraFragment fragment = CameraFragment.newInstance(image.getAbsolutePath());
-            getFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.grid_layout, fragment)
-                    .addToBackStack(null)
-                    .commit();
-        }
-    }
-
-
-    private class ForeignFileBehavior extends InteractionBehavior {
-        public ForeignFileBehavior(Fragment fragment) {
-            super(fragment);
-        }
-
-        @Override
-        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-
-            File file = (File) adapterView.getItemAtPosition(position);
-
-            Intent intent = new Intent(getActivity(), ComparisonActivity.class);
-            intent.putExtra(ComparisonActivity.KEY_REF_IMAGE_PATH, file.getAbsolutePath());
-            startActivity(intent);
         }
     }
 }

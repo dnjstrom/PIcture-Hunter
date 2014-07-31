@@ -130,7 +130,6 @@ public class AlbumListFragment extends Fragment{
     }
 
     private class UserFileBehavior extends InteractionBehavior {
-
         public UserFileBehavior(Fragment fragment) {
             super(fragment);
         }

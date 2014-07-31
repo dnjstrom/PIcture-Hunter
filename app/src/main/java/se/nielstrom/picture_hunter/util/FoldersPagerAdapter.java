@@ -14,7 +14,7 @@ import java.util.List;
  */
 public abstract class FoldersPagerAdapter extends FragmentStatePagerAdapter {
     protected List<File> folders;
-    private File location;
+    protected File location;
 
     public FoldersPagerAdapter(FragmentManager fm, File location) {
         super(fm);
