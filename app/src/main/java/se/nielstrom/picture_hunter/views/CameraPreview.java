@@ -80,18 +80,36 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         // set preview size and make any resize, rotate or
         // reformatting changes here
 
-        Camera.Parameters parameters = mCamera.getParameters();
-        Display display = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 
-        if(display.getRotation() == Surface.ROTATION_0) {
-            mCamera.setDisplayOrientation(90);
+        Camera.CameraInfo info = new Camera.CameraInfo();
+        Camera.getCameraInfo(Camera.CameraInfo.CAMERA_FACING_BACK, info);
+        int rotation = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRotation();
+        int degrees = 0;
+        switch (rotation) {
+            case Surface.ROTATION_0:
+                degrees = 0;
+                mCamera.setDisplayOrientation(90);
+                break;
+            case Surface.ROTATION_90:
+                degrees = 90;
+                break;
+            case Surface.ROTATION_180:
+                degrees = 180;
+                break;
+            case Surface.ROTATION_270:
+                degrees = 270;
+                mCamera.setDisplayOrientation(180);
+                break;
         }
+        int rotate = (info.orientation - degrees + 360) % 360;
 
-        if(display.getRotation() == Surface.ROTATION_270) {
-            mCamera.setDisplayOrientation(180);
-        }
+        //STEP #2: Set the 'rotation' parameter
+        Camera.Parameters params = mCamera.getParameters();
+        params.setRotation(rotate);
+        mCamera.setParameters(params);
 
-        mCamera.setParameters(parameters);
+
+
 
         // start preview with new settings
         try {
