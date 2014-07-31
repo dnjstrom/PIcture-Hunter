@@ -2,6 +2,7 @@ package se.nielstrom.picture_hunter.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -10,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -21,13 +23,14 @@ import se.nielstrom.picture_hunter.util.InteractionBehavior;
 import se.nielstrom.picture_hunter.util.Storage;
 
 
-public class AlbumListFragment extends Fragment {
+public class AlbumListFragment extends Fragment{
     private static final String PATH = "path";
 
     private String path;
     private File file;
     private AlbumAdapter adapter;
     private Storage storage;
+    private NfcAdapter nfcAdapter;
 
 
     public static AlbumListFragment newInstance(String path) {
@@ -71,7 +74,6 @@ public class AlbumListFragment extends Fragment {
         }
 
         grid.setAdapter(adapter);
-
         grid.setOnItemClickListener(behavior);
 
         return root;

@@ -3,6 +3,9 @@ package se.nielstrom.picture_hunter.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.nfc.NdefMessage;
+import android.nfc.NfcAdapter;
+import android.nfc.NfcEvent;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
@@ -13,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -26,7 +30,7 @@ import se.nielstrom.picture_hunter.util.ImageSaverTask;
 import se.nielstrom.picture_hunter.util.InteractionBehavior;
 import se.nielstrom.picture_hunter.util.Storage;
 
-public class PhotoListFragment extends Fragment {
+public class PhotoListFragment extends Fragment implements NfcAdapter.CreateNdefMessageCallback {
     private static final String KEY_PATH = "KEY_REF_IMAGE_PATH";
     private static final int IMAGE_SIZE = 512;
     private static final int THUMB_SIZE = 384;
@@ -37,6 +41,7 @@ public class PhotoListFragment extends Fragment {
     private Storage storage;
     private File tmpFile;
     InteractionBehavior behavior;
+    private NfcAdapter nfcAdapter;
 
     public static Fragment newInstance(String absolutePath) {
         PhotoListFragment fragment = new PhotoListFragment();
@@ -76,10 +81,22 @@ public class PhotoListFragment extends Fragment {
         adapter = new PictureAdapter(getActivity(), file);
         adapter.setAddListener(behavior);
         grid.setAdapter(adapter);
-
         grid.setOnItemClickListener(behavior);
 
+        nfcAdapter = NfcAdapter.getDefaultAdapter(getActivity());
+        if (nfcAdapter == null) {
+            Toast.makeText(getActivity(), "NFC is not available", Toast.LENGTH_LONG).show();
+        } else {
+            nfcAdapter.setNdefPushMessageCallback(this, getActivity());
+        }
+
         return root;
+    }
+
+    @Override
+    public NdefMessage createNdefMessage(NfcEvent nfcEvent) {
+        Toast.makeText(getActivity(), "Creating ndef-message!", Toast.LENGTH_SHORT).show();
+        return null;
     }
 
 
