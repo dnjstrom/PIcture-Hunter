@@ -2,11 +2,19 @@ package se.nielstrom.picture_hunter.fragments;
 
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient;
+import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
 
 import java.io.File;
 
@@ -16,13 +24,15 @@ import se.nielstrom.picture_hunter.util.ImageSaverTask;
 import se.nielstrom.picture_hunter.util.Storage;
 import se.nielstrom.picture_hunter.views.CameraPreview;
 
-public class CameraFragment extends Fragment implements View.OnClickListener {
+public class CameraFragment extends Fragment implements View.OnClickListener, GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener, LocationListener {
     private static final java.lang.String KEY_IMAGE_PATH = "KEY_REF_IMAGE_PATH";
     private final Storage storage;
     private Camera camera;
     private String path;
     private File image;
     private PictureCapturedListener listener;
+    private LocationClient locationClient;
+    private Location location;
 
     public CameraFragment() {
         storage = new Storage();
@@ -42,6 +52,21 @@ public class CameraFragment extends Fragment implements View.OnClickListener {
         if (getArguments() != null) {
             path = getArguments().getString(KEY_IMAGE_PATH);
             image = new File(path);
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        locationClient = new LocationClient(getActivity(), this, this);
+        locationClient.connect();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (locationClient != null) {
+            locationClient.disconnect();
         }
     }
 
@@ -84,7 +109,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onPictureTaken(byte[] data, Camera camera) {
                 new ImageSaverTask(data, image)
-                        .includeLocation(true)
+                        .setLocation(location)
                         .setAsyncTaskListener(new AsyncTaskListener() {
                             @Override
                             public void onTaskComplete() {
@@ -105,5 +130,27 @@ public class CameraFragment extends Fragment implements View.OnClickListener {
 
     public interface PictureCapturedListener {
         public void onPictureCaptured(File picture);
+    }
+
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        LocationRequest request = LocationRequest.create();
+        request.setInterval(30 * 1000);
+        request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        locationClient.requestLocationUpdates(request, this);
+    }
+
+    @Override
+    public void onDisconnected() {}
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {}
+
+    @Override
+    public void onLocationChanged(Location location) {
+        this.location = location;
+        Log.d(getClass().getSimpleName(), "Latitude: " + location.getLatitude());
+        Log.d(getClass().getSimpleName(), "Longitude: " + location.getLongitude());
     }
 }

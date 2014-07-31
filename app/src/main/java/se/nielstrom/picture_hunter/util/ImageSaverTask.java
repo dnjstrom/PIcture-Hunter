@@ -2,6 +2,8 @@ package se.nielstrom.picture_hunter.util;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.location.Location;
+import android.media.ExifInterface;
 import android.media.ThumbnailUtils;
 import android.os.AsyncTask;
 
@@ -18,6 +20,7 @@ public class ImageSaverTask extends AsyncTask<Void, Void, Void> {
     private byte[] sourceBytes;
     private AsyncTaskListener listener;
     private boolean includeLocation;
+    private Location location;
 
     public ImageSaverTask(File source, File destination) {
         this.sourceFile = source;
@@ -50,6 +53,19 @@ public class ImageSaverTask extends AsyncTask<Void, Void, Void> {
         } catch (IOException e) {
         }
 
+        if (location != null) {
+            try {
+                ExifInterface exif = new ExifInterface(destination.getAbsolutePath());
+                exif.setAttribute(ExifInterface.TAG_GPS_LATITUDE, LocationConverter.toDMS(location.getLatitude()));
+                exif.setAttribute(ExifInterface.TAG_GPS_LATITUDE_REF, LocationConverter.getLatitudeRef(location.getLatitude()));
+                exif.setAttribute(ExifInterface.TAG_GPS_LONGITUDE, LocationConverter.toDMS(location.getLongitude()));
+                exif.setAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF, LocationConverter.getLongitudeRef(location.getLongitude()));
+                exif.saveAttributes();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         return null;
     }
 
@@ -60,8 +76,8 @@ public class ImageSaverTask extends AsyncTask<Void, Void, Void> {
         }
     }
 
-    public ImageSaverTask includeLocation(boolean include) {
-        this.includeLocation = include;
+    public ImageSaverTask setLocation(Location location) {
+        this.location = location;
         return this;
     }
 
