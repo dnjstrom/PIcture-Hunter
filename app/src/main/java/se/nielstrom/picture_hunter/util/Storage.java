@@ -12,7 +12,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 
 public class Storage {
@@ -29,6 +31,7 @@ public class Storage {
 
     private boolean externalStorageExists;
     private File appFolder;
+    private List<ClipboardListener> listeners;
 
     private Storage(Context context) {
         this.context = context;
@@ -43,6 +46,8 @@ public class Storage {
             userAlbums = getOrCreateFolder(USER_ALBUMS);
             foreignAlbums = getOrCreateFolder(FOREIGN_ALBUMS);
         }
+
+        listeners = new ArrayList<ClipboardListener>();
     }
 
     public static Storage getInstance(Context context) {
@@ -134,6 +139,7 @@ public class Storage {
             File dst = File.createTempFile("copy", "-" + src.getName(), clipboard);
             copy(src, dst);
         }
+        notifyClipboardListeners();
     }
 
     private void copy(File src, File dst) throws IOException {
@@ -149,6 +155,7 @@ public class Storage {
     public void cut(File... files) throws IOException {
         copy(files);
         delete(files);
+        notifyClipboardListeners();
     }
 
     public void delete(File... files) {
@@ -180,5 +187,23 @@ public class Storage {
         for (File file : clipboard.listFiles()) {
             file.renameTo(new File(location, file.getName().replaceFirst("copy-\\d*-", "")));
         }
+
+        notifyClipboardListeners();
+    }
+
+
+    private void notifyClipboardListeners() {
+        for (ClipboardListener listener : listeners) {
+            listener.onClipboardChanged();
+        }
+    }
+
+    public Storage addOnClipboardListener(ClipboardListener listener) {
+        this.listeners.add(listener);
+        return this;
+    }
+
+    public interface ClipboardListener {
+        public void onClipboardChanged();
     }
 }

@@ -43,6 +43,8 @@ public class PhotoListFragment extends Fragment implements NfcAdapter.CreateNdef
     InteractionBehavior behavior;
     private NfcAdapter nfcAdapter;
     private GridView grid;
+    private boolean showAddButton;
+
 
     public static PhotoListFragment newInstance(String absolutePath) {
         PhotoListFragment fragment = new PhotoListFragment();
@@ -74,6 +76,7 @@ public class PhotoListFragment extends Fragment implements NfcAdapter.CreateNdef
         grid = (GridView) root.findViewById(R.id.photo_grid);
 
         adapter = new PictureAdapter(getActivity(), file);
+        adapter.setShowAddButton(showAddButton);
         grid.setAdapter(adapter);
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(getActivity());
@@ -105,6 +108,11 @@ public class PhotoListFragment extends Fragment implements NfcAdapter.CreateNdef
     public NdefMessage createNdefMessage(NfcEvent nfcEvent) {
         Toast.makeText(getActivity(), "Creating ndef-message!", Toast.LENGTH_SHORT).show();
         return null;
+    }
+
+    public PhotoListFragment setShowAddButton(boolean showAddButton) {
+        this.showAddButton = showAddButton;
+        return this;
     }
 
 
