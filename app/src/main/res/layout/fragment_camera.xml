@@ -5,7 +5,7 @@
     android:background="@android:color/background_dark"
     tools:context=".fragments.CameraFragment">
 
-    <se.nielstrom.picture_hunter.views.CameraPreview
+    <se.nielstrom.picture_hunter.comparator.CameraPreview
         android:id="@+id/camera_preview"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
@@ -23,11 +23,11 @@
             android:layout_weight="1">
         </FrameLayout>
 
-        <se.nielstrom.picture_hunter.views.SquareView
+        <se.nielstrom.picture_hunter.common.SquareView
             android:layout_width="fill_parent"
             android:layout_height="fill_parent">
 
-        </se.nielstrom.picture_hunter.views.SquareView>
+        </se.nielstrom.picture_hunter.common.SquareView>
 
         <FrameLayout
             android:layout_width="fill_parent"

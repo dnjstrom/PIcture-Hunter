@@ -1,4 +1,4 @@
-package se.nielstrom.picture_hunter.fragments;
+package se.nielstrom.picture_hunter.photos;
 
 import android.content.Context;
 import android.nfc.NdefMessage;
@@ -18,9 +18,7 @@ import java.io.File;
 import java.io.FileFilter;
 
 import se.nielstrom.picture_hunter.R;
-import se.nielstrom.picture_hunter.util.FileAdapter;
 import se.nielstrom.picture_hunter.util.ImageLoaderTask;
-import se.nielstrom.picture_hunter.util.PhotoBehavior;
 import se.nielstrom.picture_hunter.util.Storage;
 
 public class PhotoListFragment extends Fragment implements NfcAdapter.CreateNdefMessageCallback {

@@ -1,4 +1,4 @@
-package se.nielstrom.picture_hunter.fragments;
+package se.nielstrom.picture_hunter.albums;
 
 import android.content.Context;
 import android.nfc.NfcAdapter;
@@ -7,16 +7,14 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileFilter;
 
-import se.nielstrom.picture_hunter.AlbumListActivity;
 import se.nielstrom.picture_hunter.R;
-import se.nielstrom.picture_hunter.util.FileAdapter;
+import se.nielstrom.picture_hunter.photos.FileAdapter;
 import se.nielstrom.picture_hunter.util.InteractionBehavior;
 import se.nielstrom.picture_hunter.util.Storage;
 

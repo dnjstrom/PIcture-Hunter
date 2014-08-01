@@ -1,4 +1,4 @@
-package se.nielstrom.picture_hunter;
+package se.nielstrom.picture_hunter.photos;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -14,10 +14,10 @@ import android.widget.AdapterView;
 
 import java.io.File;
 
-import se.nielstrom.picture_hunter.fragments.CameraFragment;
-import se.nielstrom.picture_hunter.fragments.PhotoListFragment;
-import se.nielstrom.picture_hunter.util.FoldersPagerAdapter;
-import se.nielstrom.picture_hunter.util.PhotoBehavior;
+import se.nielstrom.picture_hunter.comparator.ComparisonActivity;
+import se.nielstrom.picture_hunter.R;
+import se.nielstrom.picture_hunter.comparator.CameraFragment;
+import se.nielstrom.picture_hunter.common.FoldersPagerAdapter;
 import se.nielstrom.picture_hunter.util.Storage;
 
 public class PhotoListActivity extends FragmentActivity implements Storage.ClipboardListener {

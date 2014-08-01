@@ -1,4 +1,4 @@
-package se.nielstrom.picture_hunter.fragments;
+package se.nielstrom.picture_hunter.comparator;
 
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
@@ -22,7 +22,6 @@ import se.nielstrom.picture_hunter.R;
 import se.nielstrom.picture_hunter.util.AsyncTaskListener;
 import se.nielstrom.picture_hunter.util.ImageSaverTask;
 import se.nielstrom.picture_hunter.util.Storage;
-import se.nielstrom.picture_hunter.views.CameraPreview;
 
 public class CameraFragment extends Fragment implements View.OnClickListener, GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener, LocationListener {
     private static final java.lang.String KEY_IMAGE_PATH = "KEY_REF_IMAGE_PATH";

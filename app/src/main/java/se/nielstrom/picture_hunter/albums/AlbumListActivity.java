@@ -1,23 +1,21 @@
-package se.nielstrom.picture_hunter;
+package se.nielstrom.picture_hunter.albums;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
-import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.GridView;
 import android.widget.Toast;
 
 import java.io.File;
 
-import se.nielstrom.picture_hunter.fragments.AlbumListFragment;
-import se.nielstrom.picture_hunter.util.AlbumBehavior;
-import se.nielstrom.picture_hunter.util.FoldersPagerAdapter;
+import se.nielstrom.picture_hunter.common.FoldersPagerAdapter;
+import se.nielstrom.picture_hunter.photos.PhotoListActivity;
+import se.nielstrom.picture_hunter.R;
 import se.nielstrom.picture_hunter.util.Storage;
 
 public class AlbumListActivity extends FragmentActivity {

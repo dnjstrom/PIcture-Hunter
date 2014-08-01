@@ -1,4 +1,4 @@
-package se.nielstrom.picture_hunter.util;
+package se.nielstrom.picture_hunter.photos;
 
 import android.content.Context;
 import android.os.Bundle;

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<se.nielstrom.picture_hunter.views.CheckableRowLayout
+<se.nielstrom.picture_hunter.common.CheckableRowLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/checkable_row_item"
     >
 
-    <se.nielstrom.picture_hunter.views.SquareView
+    <se.nielstrom.picture_hunter.common.SquareView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent">
 
@@ -37,7 +37,7 @@
                 />
         </RelativeLayout>
 
-    </se.nielstrom.picture_hunter.views.SquareView>
+    </se.nielstrom.picture_hunter.common.SquareView>
 
     <FrameLayout
         android:id="@+id/overlay"
@@ -49,4 +49,4 @@
     </FrameLayout>
 
 
-</se.nielstrom.picture_hunter.views.CheckableRowLayout>
+</se.nielstrom.picture_hunter.common.CheckableRowLayout>

@@ -1,9 +1,8 @@
-package se.nielstrom.picture_hunter.views;
+package se.nielstrom.picture_hunter.common;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 
 public class SquareView extends LinearLayout {
 

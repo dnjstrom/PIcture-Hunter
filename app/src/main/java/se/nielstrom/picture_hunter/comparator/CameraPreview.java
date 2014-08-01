@@ -1,4 +1,4 @@
-package se.nielstrom.picture_hunter.views;
+package se.nielstrom.picture_hunter.comparator;
 
 import android.content.Context;
 import android.hardware.Camera;

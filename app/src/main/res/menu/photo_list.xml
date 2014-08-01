@@ -1,6 +1,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="se.nielstrom.picture_hunter.PhotoListActivity" >
+    tools:context="se.nielstrom.picture_hunter.photos.PhotoListActivity" >
 
     <item android:id="@+id/paste"
           android:title="Paste"

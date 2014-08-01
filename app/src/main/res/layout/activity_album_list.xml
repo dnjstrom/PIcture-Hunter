@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="se.nielstrom.picture_hunter.AlbumListActivity">
+    tools:context="se.nielstrom.picture_hunter.albums.AlbumListActivity">
 
     <android.support.v4.view.ViewPager
         xmlns:android="http://schemas.android.com/apk/res/android"

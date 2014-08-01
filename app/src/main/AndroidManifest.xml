@@ -21,7 +21,7 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".AlbumListActivity"
+            android:name=".albums.AlbumListActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.nfc.action.NDEF_DISCOVERED"/>
@@ -34,12 +34,12 @@
         </activity>
 
         <activity
-            android:name=".PhotoListActivity"
+            android:name=".photos.PhotoListActivity"
             android:label="@string/app_name" >
         </activity>
 
         <activity
-            android:name=".ComparisonActivity"
+            android:name=".comparator.ComparisonActivity"
             android:label="@string/app_name" >
         </activity>
     </application>

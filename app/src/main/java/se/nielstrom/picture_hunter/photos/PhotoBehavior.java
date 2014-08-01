@@ -1,4 +1,4 @@
-package se.nielstrom.picture_hunter.util;
+package se.nielstrom.picture_hunter.photos;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -18,28 +18,33 @@ import java.io.File;
 import java.io.IOException;
 
 import se.nielstrom.picture_hunter.R;
+import se.nielstrom.picture_hunter.util.InteractionBehavior;
 
+public abstract class PhotoBehavior extends InteractionBehavior {
 
-public class AlbumBehavior extends InteractionBehavior {
-
-    public AlbumBehavior(Fragment fragment) {
+    public PhotoBehavior(Fragment fragment) {
         super(fragment);
     }
 
     @Override
-    public void onClick(View view) {}
+    public void onClick(View view) {
+
+    }
 
     @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {}
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+    }
+
 
     @Override
-    public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
-        fragment.getActivity().getMenuInflater().inflate(R.menu.album_actions, menu);
+    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+        fragment.getActivity().getMenuInflater().inflate(R.menu.photo_actions, menu);
         return true;
     }
 
     @Override
-    public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
         return true;
     }
 
@@ -83,6 +88,24 @@ public class AlbumBehavior extends InteractionBehavior {
                 dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
                 dialog.show();
                 break;
+            case R.id.copy:
+                try {
+                    storage.copy(files);
+                    Toast.makeText(fragment.getActivity(), "Files have been copied", Toast.LENGTH_SHORT).show();
+                    mode.finish();
+                } catch (IOException e) {
+                    Toast.makeText(fragment.getActivity(), "Couldn't copy the files", Toast.LENGTH_LONG).show();
+                }
+                break;
+            case R.id.cut:
+                try {
+                    storage.cut(files);
+                    Toast.makeText(fragment.getActivity(), "Files have been cut", Toast.LENGTH_SHORT).show();
+                    mode.finish();
+                } catch (IOException e) {
+                    Toast.makeText(fragment.getActivity(), "Couldn't cut the files", Toast.LENGTH_LONG).show();
+                }
+                break;
             case R.id.delete:
                 new AlertDialog.Builder(fragment.getActivity())
                         .setIcon(R.drawable.ic_action_discard)
@@ -105,12 +128,19 @@ public class AlbumBehavior extends InteractionBehavior {
     }
 
     @Override
-    public void onDestroyActionMode(ActionMode actionMode) {
-
+    public void onDestroyActionMode(ActionMode mode) {
     }
 
     @Override
-    public void onItemCheckedStateChanged(ActionMode actionMode, int i, long l, boolean b) {
+    public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+        GridView grid = (GridView) fragment.getView().findViewById(R.id.grid);
 
+        if (grid.getCheckedItemCount() == 1) {
+            mode.getMenu().findItem(R.id.rename).setVisible(true);
+        } else {
+            mode.getMenu().findItem(R.id.rename).setVisible(false);
+        }
+
+        return;
     }
 }

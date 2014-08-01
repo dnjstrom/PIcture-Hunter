@@ -1,4 +1,4 @@
-package se.nielstrom.picture_hunter.fragments;
+package se.nielstrom.picture_hunter.comparator;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;

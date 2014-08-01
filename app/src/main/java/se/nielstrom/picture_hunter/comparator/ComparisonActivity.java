@@ -1,8 +1,7 @@
-package se.nielstrom.picture_hunter;
+package se.nielstrom.picture_hunter.comparator;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,10 +10,8 @@ import android.widget.Toast;
 import java.io.File;
 import java.io.IOException;
 
-import se.nielstrom.picture_hunter.fragments.CameraFragment;
-import se.nielstrom.picture_hunter.fragments.DetailViewFragment;
+import se.nielstrom.picture_hunter.R;
 import se.nielstrom.picture_hunter.util.ImageComparator;
-import se.nielstrom.picture_hunter.util.LocationFinder;
 import se.nielstrom.picture_hunter.util.Storage;
 
 public class ComparisonActivity extends FragmentActivity implements CameraFragment.PictureCapturedListener {
@@ -24,7 +21,6 @@ public class ComparisonActivity extends FragmentActivity implements CameraFragme
     private File referenceFile;
     private View container;
     private boolean showingDetails;
-    private LocationFinder locationFinder;
     private Storage storage;
     private File tmpFile;
     private DetailViewFragment detailsFragment;
@@ -57,20 +53,16 @@ public class ComparisonActivity extends FragmentActivity implements CameraFragme
             }
         });
 
-        locationFinder = new LocationFinder(this);
-
         storage = Storage.getInstance(this);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        locationFinder.connect();
     }
 
     @Override
     protected void onStop() {
-        locationFinder.disconnect();
         super.onStop();
     }
 

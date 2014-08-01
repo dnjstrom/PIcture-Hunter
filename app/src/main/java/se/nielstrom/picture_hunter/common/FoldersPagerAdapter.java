@@ -1,4 +1,4 @@
-package se.nielstrom.picture_hunter.util;
+package se.nielstrom.picture_hunter.common;
 
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;

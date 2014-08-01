@@ -3,6 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/container"
-    tools:context="se.nielstrom.picture_hunter.ComparisonActivity">
+    tools:context="se.nielstrom.picture_hunter.comparator.ComparisonActivity">
 
 </RelativeLayout>

@@ -1,16 +1,10 @@
-package se.nielstrom.picture_hunter.views;
+package se.nielstrom.picture_hunter.common;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.Checkable;
 import android.widget.FrameLayout;
-import android.widget.GridView;
-import android.widget.LinearLayout;
 
 import se.nielstrom.picture_hunter.R;
 
