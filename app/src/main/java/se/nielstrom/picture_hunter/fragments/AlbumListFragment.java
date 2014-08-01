@@ -52,7 +52,7 @@ public class AlbumListFragment extends Fragment{
             path = getArguments().getString(PATH);
             file = new File(path);
         }
-        storage = new Storage();
+        storage = Storage.getInstance(getActivity());
     }
 
     @Override

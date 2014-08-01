@@ -45,10 +45,10 @@ public abstract class FileAdapter extends ArrayAdapter<File> implements View.OnC
 
             File file = new File(location, path);
 
-            if (!filter.accept(file)) {
-                return;
-            } else if ((FileObserver.CREATE & msg.what) != 0 || (FileObserver.MOVED_TO & msg.what) != 0) {
-                add(file);
+            if ((FileObserver.CREATE & msg.what) != 0 || (FileObserver.MOVED_TO & msg.what) != 0) {
+                if (filter.accept(file)) {
+                    add(file);
+                }
             } else if ((FileObserver.DELETE & msg.what) != 0 || (FileObserver.MOVED_FROM & msg.what) != 0){
                 remove(file);
             }

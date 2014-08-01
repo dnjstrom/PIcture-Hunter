@@ -6,10 +6,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
-
-import java.io.File;
 
 import se.nielstrom.picture_hunter.fragments.AlbumListFragment;
 import se.nielstrom.picture_hunter.util.FoldersPagerAdapter;
@@ -26,7 +23,7 @@ public class AlbumListActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_album_list);
 
-        storage = new Storage();
+        storage = Storage.getInstance(this);
 
         if (!storage.exists()) {
             Toast.makeText(this, "The app requires an external storage to be present.", Toast.LENGTH_LONG).show();

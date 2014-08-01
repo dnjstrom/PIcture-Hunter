@@ -35,7 +35,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Go
     private Location location;
 
     public CameraFragment() {
-        storage = new Storage();
+        storage = Storage.getInstance(getActivity());
     }
 
     public static CameraFragment newInstance(String image_path) {

@@ -63,7 +63,7 @@ public class PhotoListFragment extends Fragment implements NfcAdapter.CreateNdef
             path = getArguments().getString(KEY_PATH);
             file = new File(path);
         }
-        storage = new Storage();
+        storage = Storage.getInstance(getActivity());
     }
 
     @Override

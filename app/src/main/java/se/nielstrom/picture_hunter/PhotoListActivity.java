@@ -1,26 +1,31 @@
 package se.nielstrom.picture_hunter;
 
-import android.annotation.TargetApi;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import java.io.File;
+import java.io.IOException;
 
 import se.nielstrom.picture_hunter.fragments.CameraFragment;
 import se.nielstrom.picture_hunter.fragments.PhotoListFragment;
+import se.nielstrom.picture_hunter.util.FileAdapter;
 import se.nielstrom.picture_hunter.util.FoldersPagerAdapter;
 import se.nielstrom.picture_hunter.util.InteractionBehavior;
 import se.nielstrom.picture_hunter.util.Storage;
@@ -31,26 +36,28 @@ public class PhotoListActivity extends FragmentActivity {
     public static final String KEY_POSITION = "KEY_POSITION";
 
     private String path;
-    private File file;
+    private File location;
     private ViewPager pager;
     private FoldersPagerAdapter adapter;
     private Storage storage;
+    private Menu menu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo_list);
 
-        storage = new Storage();
+        storage = Storage.getInstance(this);
 
         Bundle extras = getIntent().getExtras();
         path = extras.getString(KEY_PATH);
         int startPosition = extras.getInt(KEY_POSITION);
-        file = new File(path);
+        location = new File(path);
 
         pager = (ViewPager) findViewById(R.id.pager);
 
-        adapter = new PhotoListAdapter(getSupportFragmentManager(), file);
+        adapter = new PhotoListAdapter(getSupportFragmentManager(), location);
+
         pager.setAdapter(adapter);
         pager.setCurrentItem(startPosition);
     }
@@ -60,6 +67,9 @@ public class PhotoListActivity extends FragmentActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.photo_list, menu);
+        this.menu = menu;
+
+        menu.findItem(R.id.paste).setVisible(storage.getClipboardCount() > 0);
         return true;
     }
 
@@ -69,11 +79,17 @@ public class PhotoListActivity extends FragmentActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
+
+        if (id == R.id.paste) {
+            storage.pasteTo(getCurrentFolder());
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private File getCurrentFolder() {
+        return adapter.getFolder(pager.getCurrentItem());
     }
 
 
@@ -111,7 +127,7 @@ public class PhotoListActivity extends FragmentActivity {
 
         @Override
         public void onClick(View view) {
-            File image = storage.createImageFileAt(file);
+            File image = storage.createImageFileAt(getCurrentFolder());
             CameraFragment fragment = CameraFragment.newInstance(image.getAbsolutePath());
             getSupportFragmentManager()
                     .beginTransaction()
@@ -133,21 +149,85 @@ public class PhotoListActivity extends FragmentActivity {
         }
 
         @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+        public boolean onActionItemClicked(final ActionMode mode, MenuItem item) {
+            GridView grid = (GridView) fragment.getView().findViewById(R.id.photo_grid);
+            final FileAdapter adapter = (FileAdapter) grid.getAdapter();
+            final SparseBooleanArray checked = grid.getCheckedItemPositions();
+
+            final File[] files = new File[grid.getCheckedItemCount()];
+
+            for (int i = 0, j = 0; i < adapter.getCount() && j < files.length; i++) {
+                if (checked.get(i)) {
+                    files[j] = adapter.getItem(i);
+                    j++;
+                }
+            }
+
             switch (item.getItemId()) {
                 case R.id.rename:
-                    Log.d("", "rename");
+                    final EditText text = new EditText(PhotoListActivity.this);
+                    text.setSingleLine();
+                    text.setText(files[0].getName());
+                    text.setSelectAllOnFocus(true);
+
+                    AlertDialog dialog = new AlertDialog.Builder(PhotoListActivity.this)
+                            .setIcon(R.drawable.ic_action_edit)
+                            .setTitle("Rename picture")
+                            .setView(text)
+                            .setPositiveButton("Rename", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    String name = String.valueOf(text.getText());
+                                    files[0].renameTo(new File(files[0].getParentFile(), name));
+                                    mode.finish();
+                                }
+                            })
+                            .setNegativeButton("Cancel", null)
+                            .create();
+
+                    dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+                    dialog.show();
                     break;
                 case R.id.copy:
-                    Log.d("", "copy");
+                    try {
+                        storage.copy(files);
+                        Toast.makeText(PhotoListActivity.this, "Files have been copied", Toast.LENGTH_SHORT).show();
+                        mode.finish();
+                        MenuItem paste = menu.findItem(R.id.paste);
+                        paste.setVisible(storage.getClipboardCount() > 0);
+                    } catch (IOException e) {
+                        Toast.makeText(PhotoListActivity.this, "Couldn't copy the files", Toast.LENGTH_LONG).show();
+                    }
                     break;
                 case R.id.cut:
-                    Log.d("", "cut");
+                    try {
+                        storage.cut(files);
+                        Toast.makeText(PhotoListActivity.this, "Files have been cut", Toast.LENGTH_SHORT).show();
+                        mode.finish();
+                        MenuItem paste = menu.findItem(R.id.paste);
+                        paste.setVisible(storage.getClipboardCount() > 0);
+                    } catch (IOException e) {
+                        Toast.makeText(PhotoListActivity.this, "Couldn't cut the files", Toast.LENGTH_LONG).show();
+                    }
                     break;
                 case R.id.delete:
-                    Log.d("", "delete");
+                    new AlertDialog.Builder(PhotoListActivity.this)
+                            .setIcon(R.drawable.ic_action_discard)
+                            .setTitle("Confirm deletion")
+                            .setMessage("Are you sure you want to delete these pictures?")
+                            .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    storage.delete(files);
+                                    mode.finish();
+                                }
+
+                            })
+                            .setNegativeButton("Cancel", null)
+                            .show();
                     break;
             }
+
             return true;
         }
 

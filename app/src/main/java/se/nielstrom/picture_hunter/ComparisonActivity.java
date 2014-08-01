@@ -59,7 +59,7 @@ public class ComparisonActivity extends FragmentActivity implements CameraFragme
 
         locationFinder = new LocationFinder(this);
 
-        storage = new Storage();
+        storage = Storage.getInstance(this);
     }
 
     @Override
