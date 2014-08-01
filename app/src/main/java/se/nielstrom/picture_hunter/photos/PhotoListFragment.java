@@ -18,7 +18,9 @@ import java.io.File;
 import java.io.FileFilter;
 
 import se.nielstrom.picture_hunter.R;
+import se.nielstrom.picture_hunter.comparator.ComparisonActivity;
 import se.nielstrom.picture_hunter.util.ImageLoaderTask;
+import se.nielstrom.picture_hunter.util.ImageSaverTask;
 import se.nielstrom.picture_hunter.util.Storage;
 
 public class PhotoListFragment extends Fragment implements NfcAdapter.CreateNdefMessageCallback {
@@ -114,6 +116,8 @@ public class PhotoListFragment extends Fragment implements NfcAdapter.CreateNdef
         @Override
         protected View createFileView(int position, View view, ViewGroup parent) {
             File file = getItem(position);
+            String s = ImageSaverTask.readModelData(file);
+            boolean matched = ImageSaverTask.readModelData(file).equals(ComparisonActivity.MATCHED);
 
             ViewHolder holder;
 
@@ -128,6 +132,7 @@ public class PhotoListFragment extends Fragment implements NfcAdapter.CreateNdef
 
             holder.title.setText(file.getName());
             new ImageLoaderTask(holder.image, THUMB_SIZE, THUMB_SIZE).execute(file.getAbsolutePath());
+            holder.matched.setVisibility(matched ? View.VISIBLE: View.INVISIBLE);
 
             return view;
         }
@@ -136,10 +141,12 @@ public class PhotoListFragment extends Fragment implements NfcAdapter.CreateNdef
         private class ViewHolder {
             public TextView title;
             public ImageView image;
+            private ImageView matched;
 
             public ViewHolder(View view) {
                 title = (TextView) view.findViewById(R.id.title);
                 image = (ImageView) view.findViewById(R.id.image);
+                matched = (ImageView) view.findViewById(R.id.matched);
             }
         }
     }

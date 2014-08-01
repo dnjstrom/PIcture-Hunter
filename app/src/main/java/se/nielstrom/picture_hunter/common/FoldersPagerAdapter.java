@@ -30,6 +30,16 @@ public abstract class FoldersPagerAdapter extends FragmentStatePagerAdapter {
     }
 
 
+    public int getFolderPosition(File file) {
+        for (int i = 0; i < folders.size(); i++) {
+            if (folders.get(i).equals(file)) {
+                return i;
+            }
+        }
+
+        throw new IndexOutOfBoundsException("Couldn't find the requested file: " + file.getAbsolutePath());
+    }
+
     public File getFolder(int position) {
         return folders.get(position);
     }

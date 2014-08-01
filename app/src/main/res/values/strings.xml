@@ -2,8 +2,10 @@
 <resources>
 
     <string name="app_name">Picture Hunter</string>
-    <string name="title_activity_login">LoginActivity</string>
-    <string name="hello_world">Hello world!</string>
+
+    <string name="successful_match">Congratulations! You successfully matched the picture!</string>
+    <string name="failed_match">Pictures doesn\'t match</string>
+
     <string name="action_settings">Settings</string>
     <string name="title_activity_album_list">AlbumListActivity</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>

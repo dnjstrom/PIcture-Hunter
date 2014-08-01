@@ -54,19 +54,47 @@ public class ImageSaverTask extends AsyncTask<Void, Void, Void> {
         }
 
         if (location != null) {
-            try {
-                ExifInterface exif = new ExifInterface(destination.getAbsolutePath());
-                exif.setAttribute(ExifInterface.TAG_GPS_LATITUDE, LocationConverter.toDMS(location.getLatitude()));
-                exif.setAttribute(ExifInterface.TAG_GPS_LATITUDE_REF, LocationConverter.getLatitudeRef(location.getLatitude()));
-                exif.setAttribute(ExifInterface.TAG_GPS_LONGITUDE, LocationConverter.toDMS(location.getLongitude()));
-                exif.setAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF, LocationConverter.getLongitudeRef(location.getLongitude()));
-                exif.saveAttributes();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            writeLocationData(destination, location);
         }
 
         return null;
+    }
+
+    public static boolean writeModelData(File file, String text) {
+        try {
+            ExifInterface exif = new ExifInterface(file.getAbsolutePath());
+            exif.setAttribute(ExifInterface.TAG_MODEL, text);
+            exif.saveAttributes();
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    public static String readModelData(File file) {
+        String text = null;
+
+        try {
+            ExifInterface exif = new ExifInterface(file.getAbsolutePath());
+            text = exif.getAttribute(ExifInterface.TAG_MODEL);
+        } catch (IOException e) {}
+
+        return (text != null) ? text : "";
+    }
+
+
+    public static boolean writeLocationData(File file, Location location) {
+        try {
+            ExifInterface exif = new ExifInterface(file.getAbsolutePath());
+            exif.setAttribute(ExifInterface.TAG_GPS_LATITUDE, LocationConverter.toDMS(location.getLatitude()));
+            exif.setAttribute(ExifInterface.TAG_GPS_LATITUDE_REF, LocationConverter.getLatitudeRef(location.getLatitude()));
+            exif.setAttribute(ExifInterface.TAG_GPS_LONGITUDE, LocationConverter.toDMS(location.getLongitude()));
+            exif.setAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF, LocationConverter.getLongitudeRef(location.getLongitude()));
+            exif.saveAttributes();
+            return true;
+        } catch (IOException e) {
+            return false;
+        }
     }
 
     @Override

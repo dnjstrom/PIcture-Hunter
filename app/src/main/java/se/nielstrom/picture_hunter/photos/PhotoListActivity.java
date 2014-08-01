@@ -26,7 +26,7 @@ public class PhotoListActivity extends FragmentActivity implements Storage.Clipb
     public static final String KEY_POSITION = "KEY_POSITION";
 
     private String path;
-    private File location;
+    private File file;
     private ViewPager pager;
     private FoldersPagerAdapter adapter;
     private Storage storage;
@@ -42,15 +42,16 @@ public class PhotoListActivity extends FragmentActivity implements Storage.Clipb
 
         Bundle extras = getIntent().getExtras();
         path = extras.getString(KEY_PATH);
-        int startPosition = extras.getInt(KEY_POSITION);
-        location = new File(path);
+        file = new File(path);
 
         pager = (ViewPager) findViewById(R.id.pager);
-
-        adapter = new PhotoListAdapter(getSupportFragmentManager(), location);
-
+        adapter = new PhotoListAdapter(getSupportFragmentManager(), file.getParentFile());
         pager.setAdapter(adapter);
-        pager.setCurrentItem(startPosition);
+
+        try {
+            int position = adapter.getFolderPosition(file);
+            pager.setCurrentItem(position);
+        } catch (IndexOutOfBoundsException e) {}
     }
 
 

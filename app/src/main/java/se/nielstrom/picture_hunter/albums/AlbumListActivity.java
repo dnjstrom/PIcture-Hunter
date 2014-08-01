@@ -50,31 +50,7 @@ public class AlbumListActivity extends FragmentActivity {
 
     }
 
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.album_list, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    private void enterAlbum(File album, int position) {
-        Intent intent = new Intent(this, PhotoListActivity.class);
-        intent.putExtra(PhotoListActivity.KEY_PATH, album.getAbsolutePath());
-        intent.putExtra(PhotoListActivity.KEY_POSITION, position);
-        startActivity(intent);
+    private void enterAlbum(File album) {
     }
 
     private class Behavior extends AlbumBehavior {
@@ -90,7 +66,9 @@ public class AlbumListActivity extends FragmentActivity {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
             File file = (File) adapterView.getAdapter().getItem(i);
-            enterAlbum(file.getParentFile(), i);
+            Intent intent = new Intent(AlbumListActivity.this, PhotoListActivity.class);
+            intent.putExtra(PhotoListActivity.KEY_PATH, file.getAbsolutePath());
+            startActivity(intent);
         }
     }
 }

@@ -185,7 +185,11 @@ public class Storage {
         }
 
         for (File file : clipboard.listFiles()) {
-            file.renameTo(new File(location, file.getName().replaceFirst("copy-\\d*-", "")));
+            File destination = new File(location, file.getName().replaceFirst("copy-\\d*-", ""));
+            file.renameTo(destination);
+            if (isUserFile(location)) {
+                ImageSaverTask.writeModelData(destination, "");
+            }
         }
 
         notifyClipboardListeners();
