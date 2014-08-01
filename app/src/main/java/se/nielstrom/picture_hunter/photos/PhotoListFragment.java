@@ -1,11 +1,13 @@
 package se.nielstrom.picture_hunter.photos;
 
 import android.content.Context;
+import android.net.Uri;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcEvent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,20 +25,17 @@ import se.nielstrom.picture_hunter.util.ImageLoaderTask;
 import se.nielstrom.picture_hunter.util.ImageSaverTask;
 import se.nielstrom.picture_hunter.util.Storage;
 
-public class PhotoListFragment extends Fragment implements NfcAdapter.CreateNdefMessageCallback {
+public class PhotoListFragment extends Fragment implements NfcAdapter.CreateBeamUrisCallback{
     private static final String KEY_PATH = "KEY_REF_IMAGE_PATH";
-    private static final int IMAGE_SIZE = 512;
     private static final int THUMB_SIZE = 384;
 
     private String path;
     private File file;
     private PictureAdapter adapter;
-    private Storage storage;
-    private File tmpFile;
     PhotoBehavior behavior;
-    private NfcAdapter nfcAdapter;
     private GridView grid;
     private boolean showAddButton = true;
+    private NfcAdapter nfcAdapter;
 
 
     public static PhotoListFragment newInstance(String absolutePath) {
@@ -58,7 +57,6 @@ public class PhotoListFragment extends Fragment implements NfcAdapter.CreateNdef
             path = getArguments().getString(KEY_PATH);
             file = new File(path);
         }
-        storage = Storage.getInstance(getActivity());
     }
 
     @Override
@@ -75,11 +73,13 @@ public class PhotoListFragment extends Fragment implements NfcAdapter.CreateNdef
         adapter.setAddListener(behavior);
         grid.setAdapter(adapter);
 
+
+
         nfcAdapter = NfcAdapter.getDefaultAdapter(getActivity());
         if (nfcAdapter == null) {
             Toast.makeText(getActivity(), "NFC is not available", Toast.LENGTH_LONG).show();
         } else {
-            nfcAdapter.setNdefPushMessageCallback(this, getActivity());
+            nfcAdapter.setBeamPushUrisCallback(this, getActivity());
         }
 
         return root;
@@ -90,15 +90,24 @@ public class PhotoListFragment extends Fragment implements NfcAdapter.CreateNdef
         return this;
     }
 
-    @Override
-    public NdefMessage createNdefMessage(NfcEvent nfcEvent) {
-        Toast.makeText(getActivity(), "Creating ndef-message!", Toast.LENGTH_SHORT).show();
-        return null;
-    }
-
     public PhotoListFragment setShowAddButton(boolean showAddButton) {
         this.showAddButton = showAddButton;
         return this;
+    }
+
+    @Override
+    public Uri[] createBeamUris(NfcEvent nfcEvent) {
+        Uri[] uris = new Uri[grid.getCheckedItemCount()];
+        SparseBooleanArray checked = grid.getCheckedItemPositions();
+
+        for (int i = 0, j=0; i < grid.getCount() && j < uris.length; i++) {
+            if (checked.get(i)) {
+                uris[j] = Uri.fromFile(adapter.getItem(i));
+                j++;
+            }
+        }
+
+        return uris;
     }
 
 

@@ -2,15 +2,22 @@ package se.nielstrom.picture_hunter.photos;
 
 import android.content.Intent;
 import android.net.Uri;
+import android.nfc.NdefMessage;
+import android.nfc.NfcAdapter;
+import android.nfc.NfcEvent;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.SparseBooleanArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.GridView;
+import android.widget.ListAdapter;
+import android.widget.Toast;
 
 import java.io.File;
 
@@ -31,6 +38,7 @@ public class PhotoListActivity extends FragmentActivity implements Storage.Clipb
     private FoldersPagerAdapter adapter;
     private Storage storage;
     private Menu menu;
+    private NfcAdapter nfcAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +61,6 @@ public class PhotoListActivity extends FragmentActivity implements Storage.Clipb
             pager.setCurrentItem(position);
         } catch (IndexOutOfBoundsException e) {}
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
