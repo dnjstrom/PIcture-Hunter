@@ -5,11 +5,12 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <Button
+    <ImageButton
         android:id="@+id/button_add"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:text="New Picture"
+        android:src="@drawable/ic_action_new_picture"
         />
 
 </se.nielstrom.picture_hunter.common.SquareView>

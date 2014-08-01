@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageButton;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -99,7 +100,7 @@ public abstract class FileAdapter extends ArrayAdapter<File> implements View.OnC
         if (showAddButton && i == super.getCount()) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(addButtonId, parent, false);
-            Button button = (Button) view.findViewById(R.id.button_add);
+            ImageButton button = (ImageButton) view.findViewById(R.id.button_add);
             button.setOnClickListener(this);
             view.setTag(BUTTON_TAG);
             return view;

@@ -9,7 +9,10 @@
 
     <se.nielstrom.picture_hunter.common.SquareView
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent">
+        android:layout_height="fill_parent"
+        android:background="@drawable/btn_default_normal_holo_dark"
+        android:padding="4dp"
+        >
 
 
         <RelativeLayout
@@ -43,8 +46,8 @@
         android:id="@+id/overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@android:color/holo_blue_dark"
-        android:alpha="0.4"
+        android:background="@color/overlay"
+        android:alpha="0.35"
         android:visibility="invisible">
     </FrameLayout>
 
