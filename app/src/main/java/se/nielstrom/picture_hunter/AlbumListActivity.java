@@ -1,14 +1,22 @@
 package se.nielstrom.picture_hunter;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
+import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.GridView;
 import android.widget.Toast;
 
+import java.io.File;
+
 import se.nielstrom.picture_hunter.fragments.AlbumListFragment;
+import se.nielstrom.picture_hunter.util.AlbumBehavior;
 import se.nielstrom.picture_hunter.util.FoldersPagerAdapter;
 import se.nielstrom.picture_hunter.util.Storage;
 
@@ -34,7 +42,8 @@ public class AlbumListActivity extends FragmentActivity {
         adapter = new FoldersPagerAdapter(getSupportFragmentManager(), storage.getAppFolder()) {
             @Override
             public Fragment getItem(int position) {
-                return AlbumListFragment.newInstance(folders.get(position).getAbsolutePath());
+                AlbumListFragment fragment = AlbumListFragment.newInstance(folders.get(position).getAbsolutePath());
+                return fragment.setBehavior(new Behavior(fragment));
             }
         };
 
@@ -61,5 +70,29 @@ public class AlbumListActivity extends FragmentActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void enterAlbum(File album, int position) {
+        Intent intent = new Intent(this, PhotoListActivity.class);
+        intent.putExtra(PhotoListActivity.KEY_PATH, album.getAbsolutePath());
+        intent.putExtra(PhotoListActivity.KEY_POSITION, position);
+        startActivity(intent);
+    }
+
+    private class Behavior extends AlbumBehavior {
+        public Behavior(Fragment fragment) {
+            super(fragment);
+        }
+
+        @Override
+        public void onClick(View view) {
+            storage.createAlbumAt(adapter.getFolder(pager.getCurrentItem()));
+        }
+
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+            File file = (File) adapterView.getAdapter().getItem(i);
+            enterAlbum(file.getParentFile(), i);
+        }
     }
 }

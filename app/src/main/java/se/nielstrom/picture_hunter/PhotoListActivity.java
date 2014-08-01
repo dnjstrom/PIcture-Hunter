@@ -1,7 +1,5 @@
 package se.nielstrom.picture_hunter;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.Fragment;
@@ -9,25 +7,17 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
-import android.util.SparseBooleanArray;
-import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.AdapterView;
-import android.widget.EditText;
-import android.widget.GridView;
-import android.widget.Toast;
 
 import java.io.File;
-import java.io.IOException;
 
 import se.nielstrom.picture_hunter.fragments.CameraFragment;
 import se.nielstrom.picture_hunter.fragments.PhotoListFragment;
-import se.nielstrom.picture_hunter.util.FileAdapter;
 import se.nielstrom.picture_hunter.util.FoldersPagerAdapter;
-import se.nielstrom.picture_hunter.util.InteractionBehavior;
+import se.nielstrom.picture_hunter.util.PhotoBehavior;
 import se.nielstrom.picture_hunter.util.Storage;
 
 public class PhotoListActivity extends FragmentActivity implements Storage.ClipboardListener {
@@ -118,7 +108,7 @@ public class PhotoListActivity extends FragmentActivity implements Storage.Clipb
     }
 
 
-    private class UserFileBehavior extends InteractionBehavior {
+    private class UserFileBehavior extends PhotoBehavior {
         public UserFileBehavior(Fragment fragment) {
             super(fragment);
         }
@@ -145,7 +135,7 @@ public class PhotoListActivity extends FragmentActivity implements Storage.Clipb
     }
 
 
-    private class ForeignFileBehavior extends InteractionBehavior {
+    private class ForeignFileBehavior extends PhotoBehavior {
         public ForeignFileBehavior(Fragment fragment) {
             super(fragment);
         }

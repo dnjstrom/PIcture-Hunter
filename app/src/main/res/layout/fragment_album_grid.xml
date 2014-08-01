@@ -8,11 +8,12 @@
     <GridView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/album_grid"
+        android:id="@+id/grid"
         android:numColumns="auto_fit"
         android:gravity="center"
         android:columnWidth="150dp"
         android:stretchMode="columnWidth"
+        android:choiceMode="multipleChoiceModal"
         />
 
 </LinearLayout>

@@ -1,18 +1,14 @@
 package se.nielstrom.picture_hunter.fragments;
 
 import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcEvent;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -20,14 +16,11 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.IOException;
 
-import se.nielstrom.picture_hunter.ComparisonActivity;
 import se.nielstrom.picture_hunter.R;
 import se.nielstrom.picture_hunter.util.FileAdapter;
 import se.nielstrom.picture_hunter.util.ImageLoaderTask;
-import se.nielstrom.picture_hunter.util.ImageSaverTask;
-import se.nielstrom.picture_hunter.util.InteractionBehavior;
+import se.nielstrom.picture_hunter.util.PhotoBehavior;
 import se.nielstrom.picture_hunter.util.Storage;
 
 public class PhotoListFragment extends Fragment implements NfcAdapter.CreateNdefMessageCallback {
@@ -40,10 +33,10 @@ public class PhotoListFragment extends Fragment implements NfcAdapter.CreateNdef
     private PictureAdapter adapter;
     private Storage storage;
     private File tmpFile;
-    InteractionBehavior behavior;
+    PhotoBehavior behavior;
     private NfcAdapter nfcAdapter;
     private GridView grid;
-    private boolean showAddButton;
+    private boolean showAddButton = true;
 
 
     public static PhotoListFragment newInstance(String absolutePath) {
@@ -73,10 +66,13 @@ public class PhotoListFragment extends Fragment implements NfcAdapter.CreateNdef
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_photo_grid, container, false);
 
-        grid = (GridView) root.findViewById(R.id.photo_grid);
+        grid = (GridView) root.findViewById(R.id.grid);
+        grid.setOnItemClickListener(behavior);
+        grid.setMultiChoiceModeListener(behavior);
 
         adapter = new PictureAdapter(getActivity(), file);
         adapter.setShowAddButton(showAddButton);
+        adapter.setAddListener(behavior);
         grid.setAdapter(adapter);
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(getActivity());
@@ -86,20 +82,10 @@ public class PhotoListFragment extends Fragment implements NfcAdapter.CreateNdef
             nfcAdapter.setNdefPushMessageCallback(this, getActivity());
         }
 
-        setBehaviorDeffered(behavior);
-
         return root;
     }
 
-    private void setBehaviorDeffered(InteractionBehavior behavior) {
-        adapter.setAddListener(behavior);
-        grid.setOnItemClickListener(behavior);
-        //grid.setOnItemLongClickListener(behavior);
-        //grid.setOnItemSelectedListener(behavior);
-        grid.setMultiChoiceModeListener(behavior);
-    }
-
-    public PhotoListFragment setBehavior(InteractionBehavior behavior) {
+    public PhotoListFragment setBehavior(PhotoBehavior behavior) {
         this.behavior = behavior;
         return this;
     }

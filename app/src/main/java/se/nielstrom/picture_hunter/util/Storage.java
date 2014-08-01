@@ -160,7 +160,7 @@ public class Storage {
 
     public void delete(File... files) {
         for (File file : files) {
-            file.delete();
+            deleteRecursive(file);
         }
     }
 

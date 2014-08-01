@@ -43,7 +43,8 @@
         android:id="@+id/overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/row_selected"
+        android:background="@android:color/holo_blue_dark"
+        android:alpha="0.4"
         android:visibility="invisible">
     </FrameLayout>
 

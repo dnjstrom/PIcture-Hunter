@@ -1,7 +1,6 @@
 package se.nielstrom.picture_hunter.fragments;
 
 import android.content.Context;
-import android.content.Intent;
 import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,12 +10,11 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileFilter;
 
-import se.nielstrom.picture_hunter.PhotoListActivity;
+import se.nielstrom.picture_hunter.AlbumListActivity;
 import se.nielstrom.picture_hunter.R;
 import se.nielstrom.picture_hunter.util.FileAdapter;
 import se.nielstrom.picture_hunter.util.InteractionBehavior;
@@ -31,6 +29,7 @@ public class AlbumListFragment extends Fragment{
     private AlbumAdapter adapter;
     private Storage storage;
     private NfcAdapter nfcAdapter;
+    private InteractionBehavior behavior;
 
 
     public static AlbumListFragment newInstance(String path) {
@@ -60,18 +59,11 @@ public class AlbumListFragment extends Fragment{
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_album_grid, container, false);
 
-        GridView grid = (GridView) root.findViewById(R.id.album_grid);
+        GridView grid = (GridView) root.findViewById(R.id.grid);
+        grid.setMultiChoiceModeListener(behavior);
 
         adapter = new AlbumAdapter(getActivity(), file);
-        InteractionBehavior behavior;
-
-        if (storage.isUserFile(file)) {
-            behavior = new UserFileBehavior(this);
-            adapter.setAddListener(behavior);
-        } else {
-            behavior = new ForeignFileBehavior(this);
-            adapter.setShowAddButton(false);
-        }
+        adapter.setAddListener(behavior);
 
         grid.setAdapter(adapter);
         grid.setOnItemClickListener(behavior);
@@ -79,6 +71,10 @@ public class AlbumListFragment extends Fragment{
         return root;
     }
 
+    public AlbumListFragment setBehavior(InteractionBehavior behavior) {
+        this.behavior = behavior;
+        return this;
+    }
 
     private class AlbumAdapter extends FileAdapter {
 
@@ -118,44 +114,6 @@ public class AlbumListFragment extends Fragment{
             public ViewHolder(View view) {
                 title = (TextView) view.findViewById(R.id.title);
             }
-        }
-    }
-
-
-    private void enterAlbum(File album, int position) {
-        Intent intent = new Intent(getActivity(), PhotoListActivity.class);
-        intent.putExtra(PhotoListActivity.KEY_PATH, album.getAbsolutePath());
-        intent.putExtra(PhotoListActivity.KEY_POSITION, position);
-        startActivity(intent);
-    }
-
-    private class UserFileBehavior extends InteractionBehavior {
-        public UserFileBehavior(Fragment fragment) {
-            super(fragment);
-        }
-
-        @Override
-        public void onClick(View view) {
-            storage.createAlbumAt(file);
-        }
-
-        @Override
-        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-            File file = (File) adapterView.getAdapter().getItem(i);
-            enterAlbum(file.getParentFile(), i);
-        }
-    }
-
-
-    private class ForeignFileBehavior extends InteractionBehavior {
-        public ForeignFileBehavior(Fragment fragment) {
-            super(fragment);
-        }
-
-        @Override
-        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-            File file = (File) adapterView.getAdapter().getItem(i);
-            enterAlbum(file.getParentFile(), i);
         }
     }
 }
