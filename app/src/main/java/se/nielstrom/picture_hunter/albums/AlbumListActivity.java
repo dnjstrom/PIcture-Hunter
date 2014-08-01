@@ -19,6 +19,7 @@ import java.io.File;
 import se.nielstrom.picture_hunter.common.FoldersPagerAdapter;
 import se.nielstrom.picture_hunter.photos.PhotoListActivity;
 import se.nielstrom.picture_hunter.R;
+import se.nielstrom.picture_hunter.util.ImageSaverTask;
 import se.nielstrom.picture_hunter.util.Storage;
 
 public class AlbumListActivity extends FragmentActivity {
@@ -79,6 +80,10 @@ public class AlbumListActivity extends FragmentActivity {
             File source = new File(path);
             File destination = new File(Storage.FOREIGN_ALBUMS, "New Beam Album");
             source.renameTo(Storage.makeUnique(destination));
+
+            for (File file : source.listFiles()) {
+                ImageSaverTask.writeModelData(file, "");
+            }
 
             Intent i = new Intent(this, PhotoListActivity.class);
             i.putExtra(PhotoListActivity.KEY_PATH, destination.getAbsolutePath());
