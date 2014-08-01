@@ -101,7 +101,7 @@ public class Storage {
         return File.createTempFile(createTimeStamp(), ".jpg", appFolder);
     }
 
-    private File makeUnique(File file) {
+    public static File makeUnique(File file) {
         File unique = file;
 
         for (int i = 0; unique.exists(); i++) {

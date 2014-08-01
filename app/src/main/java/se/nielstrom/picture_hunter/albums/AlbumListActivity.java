@@ -1,7 +1,10 @@
 package se.nielstrom.picture_hunter.albums;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
@@ -48,9 +51,59 @@ public class AlbumListActivity extends FragmentActivity {
         pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(adapter);
 
+        handleViewIntent(getIntent());
     }
 
-    private void enterAlbum(File album) {
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        handleViewIntent(intent);
+    }
+
+    private void handleViewIntent(Intent intent) {
+        if (!intent.getAction().equals(Intent.ACTION_VIEW)) {
+            return;
+        }
+
+        Uri beamUri = intent.getData();
+
+        String path = null;
+
+        if (beamUri.getScheme().equals("file")) {
+            path = handleFileUri(beamUri);
+        } else if (beamUri.getScheme().equals("file")) {
+            path = handleContentUri(beamUri);
+        }
+
+        if (path != null) {
+            File source = new File(path);
+            File destination = new File(Storage.FOREIGN_ALBUMS, "New Beam Album");
+            source.renameTo(Storage.makeUnique(destination));
+
+            Intent i = new Intent(this, PhotoListActivity.class);
+            i.putExtra(PhotoListActivity.KEY_PATH, destination.getAbsolutePath());
+            startActivity(i);
+        }
+    }
+
+    private String handleFileUri(Uri uri) {
+        File file = new File(uri.getPath());
+        return file.getParent();
+    }
+
+    public String handleContentUri(Uri uri) {
+        if (uri.getAuthority().equals(MediaStore.AUTHORITY)) {
+            String[] projection = { MediaStore.MediaColumns.DATA };
+            Cursor pathCursor = getContentResolver().query(uri, projection, null, null, null);
+
+            if (pathCursor != null && pathCursor.moveToFirst()) {
+                int filenameIndex = pathCursor.getColumnIndex(MediaStore.MediaColumns.DATA);
+                String fileName = pathCursor.getString(filenameIndex);
+                return new File(fileName).getParent();
+            }
+        }
+
+        return null;
     }
 
     private class Behavior extends AlbumBehavior {
