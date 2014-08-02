@@ -86,10 +86,12 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Go
         return root;
     }
 
-
-    private boolean hasCamera() {
-        return getActivity().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA);
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        camera.release();
     }
+
 
     public static Camera getCameraInstance(){
         Camera c = null;

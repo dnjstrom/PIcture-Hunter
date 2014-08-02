@@ -20,6 +20,7 @@ public class ComparisonActivity extends FragmentActivity implements CameraFragme
 
     public static final String KEY_REF_IMAGE_PATH = "KEY_REF_IMAGE_PATH";
     public static final String MATCHED = "MATCHED";
+    private static final int MATCHING_THRESHOLD = 800;
 
     private String reference_path;
     private File referenceFile;
@@ -58,18 +59,19 @@ public class ComparisonActivity extends FragmentActivity implements CameraFragme
         });
 
         storage = Storage.getInstance(this);
+
+
+        if (savedInstanceState != null && !savedInstanceState.getBoolean("STATE")) {
+            flipCard();
+        }
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-    }
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
 
-    @Override
-    protected void onStop() {
-        super.onStop();
+        outState.putBoolean("STATE", showingDetails);
     }
-
 
     public void flipCard() {
         if (showingDetails) {
@@ -104,7 +106,7 @@ public class ComparisonActivity extends FragmentActivity implements CameraFragme
 
                 Log.d(getClass().getSimpleName(), "Distance: " + distance);
 
-                if (distance < 1000) {
+                if (distance < MATCHING_THRESHOLD) {
                     ImageSaverTask.writeModelData(referenceFile, MATCHED);
                     Toast.makeText(ComparisonActivity.this, R.string.successful_match, Toast.LENGTH_LONG).show();
                 } else {
@@ -115,13 +117,7 @@ public class ComparisonActivity extends FragmentActivity implements CameraFragme
                     tmpFile.delete();
                 }
 
-                getSupportFragmentManager().popBackStack();
-
-                getSupportFragmentManager()
-                        .beginTransaction()
-                        .setCustomAnimations(R.anim.shake, R.anim.vanish)
-                        .replace(R.id.container, detailsFragment)
-                        .commit();
+                flipCard();
             }
         });
     }

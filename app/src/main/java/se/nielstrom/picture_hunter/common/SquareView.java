@@ -1,10 +1,14 @@
 package se.nielstrom.picture_hunter.common;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.util.AttributeSet;
 import android.widget.LinearLayout;
 
+import se.nielstrom.picture_hunter.R;
+
 public class SquareView extends LinearLayout {
+    private boolean sizeByHeight = false;
 
     public SquareView(Context context) {
         super(context);
@@ -12,19 +16,39 @@ public class SquareView extends LinearLayout {
 
     public SquareView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        handleAttrs(attrs);
     }
 
     public SquareView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        handleAttrs(attrs);
+    }
+
+    private void handleAttrs(AttributeSet attrs) {
+        TypedArray a = getContext().getTheme().obtainStyledAttributes(attrs, R.styleable.SquareView, 0, 0);
+
+        try {
+            sizeByHeight = a.getBoolean(R.styleable.SquareView_size_by_height, false);
+        } finally {
+            a.recycle();
+        }
     }
 
     @Override
     public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, widthMeasureSpec);
+        if (sizeByHeight) {
+            super.onMeasure(heightMeasureSpec, heightMeasureSpec);
+        } else {
+            super.onMeasure(widthMeasureSpec, widthMeasureSpec);
+        }
     }
 
     @Override
     protected void onSizeChanged(final int w, final int h, final int oldw, final int oldh) {
-        super.onSizeChanged(w, w, oldw, oldh);
+        if (sizeByHeight) {
+            super.onSizeChanged(h, h, oldw, oldh);
+        } else {
+            super.onSizeChanged(w, w, oldw, oldh);
+        }
     }
 }
