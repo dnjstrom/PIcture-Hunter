@@ -53,7 +53,12 @@ public class PhotoListActivity extends FragmentActivity implements Storage.Clipb
         file = new File(path);
 
         pager = (ViewPager) findViewById(R.id.pager);
-        adapter = new PhotoListAdapter(getSupportFragmentManager(), file.getParentFile());
+        adapter = new FoldersPagerAdapter(getSupportFragmentManager(), file.getParentFile()) {
+            @Override
+            public Fragment getItem(int position) {
+                return PhotoListFragment.newInstance(folders.get(position).getAbsolutePath());
+            }
+        };
         pager.setAdapter(adapter);
 
         try {
@@ -95,65 +100,5 @@ public class PhotoListActivity extends FragmentActivity implements Storage.Clipb
     @Override
     public void onClipboardChanged() {
         menu.findItem(R.id.paste).setVisible(storage.getClipboardCount() > 0);
-    }
-
-
-    private class PhotoListAdapter extends FoldersPagerAdapter {
-        public PhotoListAdapter(FragmentManager fm, File location) {
-            super(fm, location);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            PhotoListFragment fragment = PhotoListFragment.newInstance(folders.get(position).getAbsolutePath());
-
-            if (storage.isUserFile(location)) {
-                return fragment.setBehavior(new UserFileBehavior(fragment));
-            } else {
-                return fragment.setShowAddButton(false).setBehavior(new ForeignFileBehavior(fragment));
-            }
-        }
-    }
-
-
-    private class UserFileBehavior extends PhotoBehavior {
-        public UserFileBehavior(Fragment fragment) {
-            super(fragment);
-        }
-
-        @Override
-        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-            Intent intent = new Intent();
-            intent.setAction(android.content.Intent.ACTION_VIEW);
-            File file = (File) adapterView.getItemAtPosition(position);
-            intent.setDataAndType(Uri.fromFile(file), "image/*");
-            startActivity(intent);
-        }
-
-        @Override
-        public void onClick(View view) {
-            File image = storage.createImageFileAt(getCurrentFolder());
-            CameraFragment fragment = CameraFragment.newInstance(image.getAbsolutePath());
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.grid_layout, fragment)
-                    .addToBackStack(null)
-                    .commit();
-        }
-    }
-
-
-    private class ForeignFileBehavior extends PhotoBehavior {
-        public ForeignFileBehavior(Fragment fragment) {
-            super(fragment);
-        }
-
-        @Override
-        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-            File file = (File) adapterView.getItemAtPosition(position);
-            Intent intent = new Intent(PhotoListActivity.this, ComparisonActivity.class);
-            intent.putExtra(ComparisonActivity.KEY_REF_IMAGE_PATH, file.getAbsolutePath());
-            startActivity(intent);
-        }
     }
 }

@@ -44,8 +44,7 @@ public class AlbumListActivity extends FragmentActivity {
         adapter = new FoldersPagerAdapter(getSupportFragmentManager(), storage.getAppFolder()) {
             @Override
             public Fragment getItem(int position) {
-                AlbumListFragment fragment = AlbumListFragment.newInstance(folders.get(position).getAbsolutePath());
-                return fragment.setBehavior(new Behavior(fragment));
+                return AlbumListFragment.newInstance(folders.get(position).getAbsolutePath());
             }
         };
 
@@ -109,24 +108,5 @@ public class AlbumListActivity extends FragmentActivity {
         }
 
         return null;
-    }
-
-    private class Behavior extends AlbumBehavior {
-        public Behavior(Fragment fragment) {
-            super(fragment);
-        }
-
-        @Override
-        public void onClick(View view) {
-            storage.createAlbumAt(adapter.getFolder(pager.getCurrentItem()));
-        }
-
-        @Override
-        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-            File file = (File) adapterView.getAdapter().getItem(i);
-            Intent intent = new Intent(AlbumListActivity.this, PhotoListActivity.class);
-            intent.putExtra(PhotoListActivity.KEY_PATH, file.getAbsolutePath());
-            startActivity(intent);
-        }
     }
 }
