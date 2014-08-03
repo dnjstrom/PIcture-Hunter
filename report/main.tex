@@ -1,4 +1,4 @@
-\documentclass[11px, a4paper, twocolumn]{article}
+\documentclass[11px, a4paper]{article}
 
 \usepackage[utf8]{inputenc}
 \usepackage[swedish]{babel}
@@ -18,12 +18,14 @@
 \usepackage{tocvsec2}
 
 \usepackage{biblatex}
-%\usepackage{natbib}
 
 
-%New Commands
+% Mail link
 \newcommand{\mail}[1]{\href{mailto:#1}{\nolinkurl{#1}}}
 
+\addto{\captionsswedish}{\renewcommand{\abstractname}{}}
+
+ \renewcommand{\familydefault}{\sfdefault}
 
 \bibliography{references}
 
@@ -45,9 +47,10 @@
 \begin{document}
 
 \maketitle
-
 \begin{abstract}
-	Detta är en sammanfattning.
+	\textit{
+		Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam sodales mauris purus, id consequat nisl tempor vel. Donec fermentum, ante at volutpat sodales, arcu magna blandit lectus, vel sollicitudin lorem nisl at enim. Mauris tempus fringilla interdum. Phasellus in tincidunt velit.
+	}
 \end{abstract}
 
 \tableofcontents
@@ -55,16 +58,15 @@
 \listoffigures
 
 
-\section{Koncept}
-	Detta är det första avsnittet \cite{DesignGuidelines}. Detta är en länk: \url{http://developer.android.com/design/index.html}
+\section{Introduktion}
+	aldskjalkdsj fkla jdklf alksd flk alkdf lkas dfl
 
-    \begin{figure}
-        \centering
-        \includegraphics[width=\linewidth]{img/unnamed}
-        \caption{\label{fig:android} A picture of an Android.}
-    \end{figure}
+\section{Design}
 
-    Detta är en referens till figur \ref{fig:android}.
+\section{Teknik}
+
+\section{Reflektion}
+\subsection{Säkerhet och etik}
 
 
 
