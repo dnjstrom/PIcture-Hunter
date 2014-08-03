@@ -91,6 +91,41 @@
 
 \section{Teknik}
 
+	Appen är uppbyggd med tre aktiviteter - en för album-vyn, en för bild-vyn och en för jämförelse. De första två hade nog kunnat slås ihop till en ända aktivitet, men uppdelningen hjälper till att separera vad som ska hända vid användarinteraktion. Genom att gemensam kod extraherats till egna klasser dupliceras dessutom kod endast marginellt.
+
+	Samtliga gränssnitt implementeras i huvudsak som fragment som i största möjliga mån är fristående från dess aktivitet. Vid behov används dock aktiviten som en mellanhand mellan fragmenten\cite{FragmentCommunication}. Ett tydligt exempel på detta är ComparisonActivity som startar och avslutar de båda fragmenten efter vad som är lämpligt och som tar hand om bilden som kameran tagit.
+
+	Appen uppvisar flera tekniska finesser. Några av dessa är ganska nyligen tillgada i Android så applikationen kräver en tämligen uppdaterad telefon. Den kräver även att telefonen har ett SD-kort, en kamera och NFC-förmåga.
+
+\subsection{Bildigenkänning}
+\label{subsec:image_recog}
+	Den mest grundläggande funktionaliteten i appen är jämörelsen av två bilder. I början fanns förhoppningen att denna funkion skulle finnas i Androids api eller som ett externt bibliotek till java. Ingen av dessa möjligheter visade sig tyvärr möjliga varpå jag försökte mig på att implementera jämförelsen själv med hjälp av en post på \emph{Java Image Processing Cookbook}\cite{ImageComparison}.
+
+	Jämförelsen görs genom att algoritmen väljer ut 100 punkter på varje bild och räknar ut den genomsnittsliga färgen i punktens omgivningen. Varje par punkter (en från varje bild) med samma position jämförs sedan var för sig och avståndet mellan färgerna i de två punkterna adderas till en total. Avstådet mellan två färger definieras i det här fallet som avstådet i ett tredimensionellt rum där röd, grön och blå utgör axlarna och med svart i origo. När det totala avståndet mellan bilderna räknats ut kan man jämföra detta med ett tröskelvärde som avgör hur mycket ``fel'' man tillåts. Enkelt uttryckt kan man alltså säga att algoritmen komprimerar bilden till 100x100 pixlar och sedan jämför färgen på bilderna för varje pixel.
+
+	Det finns såklart flera problem med att bara jämföra färgvärden. Till exempel genererar endast stora förändringar i form ett betydande avstånd och små detaljer försvinner in i bakgrunden när bilden ``komprimeras''. Jämförelsen är också mycket känslig för olika ljusförhållanden. Att jämförelsen inte är exakt bör dock ses som en fördel då en viss grad av fel bör tillåtas för att jämförelsen ska vara praktiskt applicerbar. Skulle en liknande app byggas för kommersiellt bruk behöver man dock givetvis använda en mer avancerad algoritm.
+
+\subsection{Kamera}
+\label{subsec:camera}
+	Då olika telefoner kan ta bilder i olika upplösning behövs någon standard införas på bilderna för att de ska kunna jämföras på ett rättvist sätt av algoritmen i avsnitt \ref{subsec:image_recog}. I vanliga fall skulle uppgiften att ta en bild delegeras till telefonens standardkameraapp men ett Intent med ACTION\_IMAGE\_CAPTURE har ingen möjlighet att påverka den slutliga storleken. Man hade kunnat normalisera bilden efteråt men då tar användaren en avlång bild men en liksidig sparas till disk. För att inte överraska användaren behöver kamerans bild motsvara slutresultatet. För att åstadkomma detta implementerades ett specialgjort kamerafragment. Kamerafragmentet används till all bildtagning i appen och begränsar bilderna till 1024x1024 pixlar.
+
+\subsection{GPS}
+	När en kameran i avsnitt \ref{subsec:camera} öppnas börjar appen fråga efter användarens koordinater. Om dessa funnits i tid till att bilden tas sparas dessa tillsammans med bilden som metadata och används för att ge spelaren som ska matcha bilden en idé om avståndet till platsen där bilden tagits.
+
+\subsection{Near Field Communication (NFC)}
+	För att dela bilder mellan två telefoner använder sig appen av Near Field Communication i from av Android Beam. Överföring av filer med hjälp av Android Beam lades till först i api-nivå 16 vilket sätter detta som minimi-sdk-krav för att kunna använda appen. Så fort telefonen förs nära en annan (ca 4cm) kommer appen kontrollera om det finns bilder markerade. Dessa förs i så fall över till den andra telefonen och appen öppnas i så fall via ett speciellt Intent Filter. På grund av hur Android Beam är implementerad levereras de nya filerna med hjälp av en Content Provider som appen läser från och flyttar in filerna till appens filarea.
+
+\subsection{ViewPager}
+	ViewPager är en del av a support library.
+
+\subsection{Animation}
+
+\subsection{Specialgjorda vyer och attribut}
+
+\subsection{Exif metadata}
+
+\subsection{Backgrundsarbete och laddning}
+
 
 \section{Reflektion}
 
