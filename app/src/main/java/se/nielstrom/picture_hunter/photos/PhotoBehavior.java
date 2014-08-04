@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 
 import se.nielstrom.picture_hunter.R;
+import se.nielstrom.picture_hunter.common.FileAdapter;
 import se.nielstrom.picture_hunter.util.InteractionBehavior;
 
 public abstract class PhotoBehavior extends InteractionBehavior {

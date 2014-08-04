@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileFilter;
 
 import se.nielstrom.picture_hunter.R;
+import se.nielstrom.picture_hunter.common.FileAdapter;
 import se.nielstrom.picture_hunter.comparator.CameraFragment;
 import se.nielstrom.picture_hunter.comparator.ComparisonActivity;
 import se.nielstrom.picture_hunter.util.ImageLoaderTask;

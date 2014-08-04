@@ -1,13 +1,11 @@
 package se.nielstrom.picture_hunter.albums;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.TextView;
 
@@ -15,8 +13,7 @@ import java.io.File;
 import java.io.FileFilter;
 
 import se.nielstrom.picture_hunter.R;
-import se.nielstrom.picture_hunter.photos.FileAdapter;
-import se.nielstrom.picture_hunter.photos.PhotoListActivity;
+import se.nielstrom.picture_hunter.common.FileAdapter;
 
 /**
  * This fragment handles the display of albums in a grid and all associated interactions.

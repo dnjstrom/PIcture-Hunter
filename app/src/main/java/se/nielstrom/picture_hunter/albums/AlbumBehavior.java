@@ -17,9 +17,8 @@ import android.widget.GridView;
 import java.io.File;
 
 import se.nielstrom.picture_hunter.R;
-import se.nielstrom.picture_hunter.photos.FileAdapter;
+import se.nielstrom.picture_hunter.common.FileAdapter;
 import se.nielstrom.picture_hunter.photos.PhotoListActivity;
-import se.nielstrom.picture_hunter.util.InteractionBehavior;
 import se.nielstrom.picture_hunter.util.Storage;
 
 
