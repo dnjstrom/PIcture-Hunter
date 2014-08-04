@@ -10,6 +10,7 @@
 \usepackage{subfigure}
 \usepackage{float}
 \usepackage{caption}
+\usepackage{epigraph}
 
 \usepackage[hyphens]{url}
 \usepackage[breaklinks,pdfpagelabels=false]{hyperref}
@@ -40,12 +41,8 @@
 \begin{document}
 
 \maketitle
-\begin{abstract}
-	\textit{
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam sodales mauris purus, id consequat nisl tempor vel. Donec fermentum, ante at volutpat sodales, arcu magna blandit lectus, vel sollicitudin lorem nisl at enim. Mauris tempus fringilla interdum. Phasellus in tincidunt velit.
-	}
-	\vspace{5mm}
-\end{abstract}
+	
+\epigraph{ ASdfasdf a}{Google Play Beskrivning}
 
 \tableofcontents
 
@@ -57,7 +54,7 @@
 
 	Ett grundläggande scenario för appens användande har varit att upptäcka en stad. I detta fall ger två personer varandra bilder de tagit någonstanns i staden. För att underlätta detta kan användaren se hur långt bort bilden är tagen (men inte vilken riktning; det är ju ett spel trots allt).
 
-	Gällande kursen är min ambition att appen ska vara bra nog för ett VG.
+	Min ambition för appen är att den ska vara bra nog för ett VG men då jag har begränsat med tid till återinlämningar nöjer jag mig med ett G om det inte rör sig om mycket små förändringar som erfodras för att nå det högre betyget.
 
 
 \section{Design}
@@ -91,9 +88,7 @@
 
 \section{Teknik}
 
-	Appen är uppbyggd med tre aktiviteter - en för album-vyn, en för bild-vyn och en för jämförelse. De första två hade nog kunnat slås ihop till en ända aktivitet, men uppdelningen hjälper till att separera vad som ska hända vid användarinteraktion. Genom att gemensam kod extraherats till egna klasser dupliceras dessutom kod endast marginellt.
-
-	Samtliga gränssnitt implementeras i huvudsak som fragment som i största möjliga mån är fristående från dess aktivitet. Vid behov används dock aktiviten som en mellanhand mellan fragmenten\cite{FragmentCommunication}. Ett tydligt exempel på detta är \emph{ComparisonActivity} som startar och avslutar de båda fragmenten efter vad som är lämpligt och som tar hand om bilden som kameran tagit.
+	Appen är uppbyggd med tre aktiviteter - en för album-vyn, en för bild-vyn och en för jämförelse.	Samtliga gränssnitt implementeras i huvudsak som fragment som i största möjliga mån är fristående från dess aktivitet. Vid behov används dock aktiviten som en mellanhand mellan fragmenten\cite{FragmentCommunication}. Ett tydligt exempel på detta är \emph{ComparisonActivity} som startar och avslutar de båda fragmenten efter vad som är lämpligt och som tar hand om bilden som kameran tagit.
 
 	Appen uppvisar flera tekniska finesser. Några av dessa är ganska nyligen tillgada i Android så applikationen kräver en tämligen uppdaterad telefon. Den kräver även att telefonen har ett SD-kort, en kamera och NFC-förmåga.
 
@@ -138,9 +133,42 @@
 	All bildhantering i appen är flyttat till bakgrundstrådar för att inte låsa gränssnittet\cite{BitmapProcessing}. Detta ses tydligast i listorna av bildminiatyrer där bilderna ibland dyker upp först efter en kort fördröjning. Dessutom undviker applikationen att ladda in stora bilder i minnet. Med hjälp av \emph{ThumbnailUtils} skapas miniatyrbilder i låg upplösning som låter appen hushålla bättre med sin minneskvota.
 
 
+
 \section{Reflektion}
+	Efter vad som föreföll en lång tids grubblande över vad för slags app jag ville bygga kom idén om att göra något med bildigenkänning. Efter lite sökning på nätet visade det sig finnas bibliotek som stödde denna funktion så jag kastade mig in i kodandet. Jag försökte visserligen stanna upp och sketcha ett par skärmar först, men jag blev snabbt otålig. Denna benägenhet till att inte definiera designen ordentligt tidigt i projektet är en svaghet i mitt arbetssätt som jag behöver arbeta mer på att förbättra. I huvudsak hade jag en bild av vad jag ville åstadkomma, och så här i efterhand kan jag säga att jag kom ganska nära.
+
+	Kodandet skedde omväxlande med efterforskningar och gradvis växte applikationen fram. Då jag inte kommit i kontakt med flera komponenter i appen tidigare så gjordes många misstag. Hade jag haft kunskapen då som jag har nu hade det säkert gått betydligt snabbare. När jag läser koden kan jag se vilka delar som skrevs när i arbetet efter vilken lösning som valts eftersom jag hela tiden lärt mig och testat nya sätt att skriva koden.
+
+	Överlag är jag nöjd med vad som åstadkommits och jag känner att jag lärt mig otroligt mycket på det här projektet.
+
 
 \subsection{Säkerhet och etik}
+	Appen är tämligen säker på så sätt att den inte använder sig av användarens information. Den ansluter inte till användarens konto och vet heller varken användarens namn, telefonnummer eller mail. Appen har bara tillgång till data som användaren avsiktligen ger den, dvs. bilder tagna med appens egna kamera.
+
+	Bilder kan dock alltid vara kännsliga om de kommer på villovägar. Ponera att bilderna på något sätt kunde fångas av en tredje part. Då skulle hen ha tillgång till själva bilden, som kan avslöja vad användaren gjort vid tillfället eller med vem hen varit,  men även vart den tagits och därmed vart användaren befunnit sig. Det kan definitivt finnas anledningar till varför en person inte skulle vilja sprida den informationen.
+
+	Förutom risken för oavsiktligt läckage kan användaren oroa sig för avsiktligt missanvändande av informationen som finns tillgänglig till appen. \emph{Picture Hunter} har inga onödiga rättigheter men har tillräckligt många och kraftfulla för att göra skada. Om appen på något sätt kunde ta bilder utan att användaren visste om det eller om appen periodiskt delade telefonens position med någon extern part skulle säkert inte användaren uppskatta detta. Delvis försvåras en sådan attack på användaren av att både användandet av gps och kamera måste synliggöras på telefonens gränssnitt.
+
+	För att vissa telefonen ska kunna ta bilder måste telefonen vara upplåst och bilderna från kameran måste visas på skärmen i en \emph{SurfaceView}. Det finns dock inga storleksrestriktioner på denna vy, så det räcker med att den renderas på en pixel vilket kan göra den praktiskt oigenkännbar. För gps:en är det mer möjligt att hämta data dolt. När gps:en är igång visas en ikon i statusranden överst i gränssnittet, men den är lätt att missa. Appen kan dessutom välja att hämta positionen medans telefonen sover via en \emph{Service} i bakgrunden.
+
+	En trygghet som användaren har när hen tänker på frågorna diskuterade ovan är att appen inte har några möjligheter att använda internet. Så även om appen samlar information om användaren finns inga uppenbara möjligheter att föra vidare den till en extern part. En mer omständig möjlighet finns dock. Kan man få användaren att installera två appar, en med internet och sd-kort tillgång men inget annat, samt en app med tillgång till flera sensorer och tjänster, inklusive sd-kortet, men inte internet, kan man använda sd-kortet för att kommunicera mellan apparna och därmed sprida datan.
+
+	En sista fara som användaren kan tänkas vara rädd för är om appen skickar data till en annan telefon som den inte bör. Eftersom appen begär tillgång till hela sd-kortet kan också skicka vilken fil som helst därifrån till andra telefoner den kommer i kontakt med via NFC. Lyckas appen då hitta användarens nakenbilder eller kanske hemliga ritningar från jobbet och skicka dessa blir nog inte användaren så glad. Det är dock svårt att se hur appens skapare skulle tjäna på ett sådant beteende.
+
+	Allt eftersom fler ``features'' läggs till i apparna kräver de också fler tillåtelser som användaren kommer ha svårt att tacka nej till. Även om användaren litar på appens skapare kanske rättigheterna till appen säljs till ett annat företag som inte har lika rena avsikter. I slutändan måste användaren lita på skaparen av appen, för även med få och till synes oskyldiga tillåtelser kan man åsamka skada och ställa till problem om de används i detta syfte. Användaren får helt enkelt försöka undvika uppenbart problematiska appar och kan bara hoppas att någon annan råkar ut för problem och anmäler övriga appar med ont uppsåt.
+
+
+\subsection{Förbättringar och vidare arbete}
+
+	Om jag hade byggt en ny version av appen hade jag slagit ihop \emph{AlbumListActivity/PhotoListActivity} och \emph{AlbumListFragment/PhotoListFragment} till en ända aktivitet respektive fragment. Detta skulle kännas snyggare, men uppdelningen hjälper faktiskt till att separera vad som ska hända vid användarinteraktion. Genom att gemensam kod har extraherats till egna klasser dupliceras dessutom kod endast marginellt. Med detta i åtanke har jag fokuserat på andra delar av appen och inte refaktorerat om då jag befarar att det skulle ta en ansenlig tid och inte ge så mycket ``poäng'' i kursen. För kursens skull hoppas jag det kan räcka med att visa att jag är medveten om problemet.
+
+	Ifall appen skulle släppas till allmänheten skulle det krävas mer ``hints'' till användaren om hur hen ska använda appen. I dagsläget förklaras få saker i appen och det finns t.ex. inte någon knapp för att ta bilder - vilket antagligen varit tydligare (om än inte funktionellt bättre). Då jag inte ämnar släppa applikationen har jag inte prioriterat upplärning av användare men har försökt använda standardiserade interaktioner.
+
+	Om appen släpps till allmänheten är det möjligt att ett mer prfilerat gränssnitt hade varit lämpligt. Appen är byggd för att vara så transparent som möjligt men som marknadsföring är detta troligen ett dåligt drag eftersom igenkänningen minskar. Gladare färger kan också tänkas attrahera användare bättre när de ser appen för första gången.
+
+	I dagsläget är enda möjligheten till bildöverföring NFC. Detta kräver att båda parter fysiskt träffas för att föra över bilder. Man kan lätt föreställa sig ett scenario där spelarna vill överföra bilder via MMS eller liknande. I en framtida app borde man kunna dela bilderna som vilken fil som helst.
+
+	En sista förbättring skulle kunna vara att byta bildjämförelsealgoritm då den nuvarande är ganska naiv och känslig. En bättre algoritm skulle kunna tänkas normalisera färgerna eller jobba med kant-identifiering.
 
 
 
