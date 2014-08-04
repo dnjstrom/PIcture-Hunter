@@ -82,32 +82,56 @@ public class AlbumListActivity extends FragmentActivity {
 
         Uri beamUri = intent.getData();
 
-        String directory = null;
+        File file = null;
 
         // get the directory of the sent files according to the scheme
         if (beamUri.getScheme().equals("file")) {
-            directory = handleFileUri(beamUri);
+            file = handleFileUri(beamUri);
         } else if (beamUri.getScheme().equals("content")) {
-            directory = handleContentUri(beamUri);
+            file = handleContentUri(beamUri);
         }
 
-        if (directory != null) {
-            File source = new File(directory);
-            File destination = new File(Storage.FOREIGN_ALBUMS, "New Beam Album");
-
-            //Move the directory to the app storage
-            source.renameTo(Storage.makeUnique(destination));
-
-            // Reset any already matched images among the files
-            for (File file : source.listFiles()) {
-                ImageSaverTask.writeModelData(file, "");
-            }
-
-            // Display the new files
-            Intent i = new Intent(this, PhotoListActivity.class);
-            i.putExtra(PhotoListActivity.KEY_PATH, destination.getAbsolutePath());
-            startActivity(i);
+        // Adjust paths if only one file is beamed
+        if (file.getParentFile().getName().equals("beam")) {
+            receiveFile(file);
+        } else {
+            receiveDirectory(file);
         }
+    }
+
+    private void receiveFile(File source) {
+        File album = new File(Storage.FOREIGN_ALBUMS, "New Beam Album");
+        album = Storage.makeUnique(album);
+        File destination = new File(album, source.getName());
+        destination.getParentFile().mkdirs();
+
+        source.renameTo(destination);
+
+        ImageSaverTask.writeModelData(destination, "");
+
+        // Display the new file
+        Intent i = new Intent(this, PhotoListActivity.class);
+        i.putExtra(PhotoListActivity.KEY_PATH, album.getAbsolutePath());
+        startActivity(i);
+    }
+
+    private void receiveDirectory(File dir) {
+        File destination = new File(Storage.FOREIGN_ALBUMS, "New Beam Album");
+        destination = Storage.makeUnique(destination);
+        destination.getParentFile().mkdirs();
+
+        //Move the directory to the app storage
+        dir.getParentFile().renameTo(destination);
+
+        // Reset any already matched images among the files
+        for (File file : destination.listFiles()) {
+            ImageSaverTask.writeModelData(file, "");
+        }
+
+        // Display the new files
+        Intent i = new Intent(this, PhotoListActivity.class);
+        i.putExtra(PhotoListActivity.KEY_PATH, destination.getAbsolutePath());
+        startActivity(i);
     }
 
     /**
@@ -116,9 +140,8 @@ public class AlbumListActivity extends FragmentActivity {
      * @param uri
      * @return the directory part of the uri file path
      */
-    private String handleFileUri(Uri uri) {
-        File file = new File(uri.getPath());
-        return file.getParent();
+    private File handleFileUri(Uri uri) {
+        return new File(uri.getPath());
     }
 
     /**
@@ -126,7 +149,7 @@ public class AlbumListActivity extends FragmentActivity {
      * @param uri
      * @return the directory that the uri points to a file in.
      */
-    public String handleContentUri(Uri uri) {
+    public File handleContentUri(Uri uri) {
         // Check the authority of the uri
         if (uri.getAuthority().equals(MediaStore.AUTHORITY)) {
             String[] projection = { MediaStore.MediaColumns.DATA };
@@ -135,8 +158,8 @@ public class AlbumListActivity extends FragmentActivity {
             // Read the data from the cursor
             if (pathCursor != null && pathCursor.moveToFirst()) {
                 int filenameIndex = pathCursor.getColumnIndex(MediaStore.MediaColumns.DATA);
-                String fileName = pathCursor.getString(filenameIndex);
-                return new File(fileName).getParent();
+                String path = pathCursor.getString(filenameIndex);
+                return new File(path);
             }
         }
 
