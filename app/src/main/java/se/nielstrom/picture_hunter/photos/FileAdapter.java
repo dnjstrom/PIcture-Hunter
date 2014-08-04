@@ -81,6 +81,10 @@ public abstract class FileAdapter extends ArrayAdapter<File> implements View.OnC
     }
 
 
+    public File getLocation() {
+        return location;
+    }
+
     @Override
     public File getItem(int position) {
         if (showAddButton && position == super.getCount()) {

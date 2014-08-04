@@ -2,6 +2,7 @@ package se.nielstrom.picture_hunter.albums;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.util.SparseBooleanArray;
 import android.view.ActionMode;
@@ -17,20 +18,54 @@ import java.io.File;
 
 import se.nielstrom.picture_hunter.R;
 import se.nielstrom.picture_hunter.photos.FileAdapter;
+import se.nielstrom.picture_hunter.photos.PhotoListActivity;
 import se.nielstrom.picture_hunter.util.InteractionBehavior;
+import se.nielstrom.picture_hunter.util.Storage;
 
 
-public class AlbumBehavior extends InteractionBehavior {
+/**
+ * Convenience class that implements the interaction possibilities of the AlbumListFragment including
+ * the context menu.
+ */
+public class AlbumBehavior  implements AdapterView.OnItemClickListener,
+                                        View.OnClickListener,
+                                        GridView.MultiChoiceModeListener {
+
+    private final Fragment fragment;
+    private final Storage storage;
 
     public AlbumBehavior(Fragment fragment) {
-        super(fragment);
+        this.fragment = fragment;
+        this.storage = Storage.getInstance(fragment.getActivity());
     }
 
+    /**
+     * Create a new album in the fragments directory.
+     *
+     * @param view
+     */
     @Override
-    public void onClick(View view) {}
+    public void onClick(View view) {
+        GridView grid = (GridView) fragment.getView().findViewById(R.id.grid);
+        FileAdapter adapter = (FileAdapter) grid.getAdapter();
+        storage.createAlbumAt(adapter.getLocation());
+    }
 
+    /**
+     * Launch a new PhotoListActivity for the clicked album.
+     *
+     * @param adapterView
+     * @param view
+     * @param i
+     * @param l
+     */
     @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {}
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        File file = (File) adapterView.getAdapter().getItem(i);
+        Intent intent = new Intent(fragment.getActivity(), PhotoListActivity.class);
+        intent.putExtra(PhotoListActivity.KEY_PATH, file.getAbsolutePath());
+        fragment.startActivity(intent);
+    }
 
     @Override
     public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
@@ -44,6 +79,19 @@ public class AlbumBehavior extends InteractionBehavior {
     }
 
     @Override
+    public void onDestroyActionMode(ActionMode actionMode) {}
+
+    @Override
+    public void onItemCheckedStateChanged(ActionMode actionMode, int i, long l, boolean b) {}
+
+    /**
+     * Takes an appropriate action according to what action bar button has been pressed.
+     *
+     * @param mode
+     * @param item
+     * @return
+     */
+    @Override
     public boolean onActionItemClicked(final ActionMode mode, MenuItem item) {
         GridView grid = (GridView) fragment.getView().findViewById(R.id.grid);
         final FileAdapter adapter = (FileAdapter) grid.getAdapter();
@@ -51,6 +99,7 @@ public class AlbumBehavior extends InteractionBehavior {
 
         final File[] files = new File[grid.getCheckedItemCount()];
 
+        // Extract the selected files for easier manipulation
         for (int i = 0, j = 0; i < adapter.getCount() && j < files.length; i++) {
             if (checked.get(i)) {
                 files[j] = adapter.getItem(i);
@@ -65,30 +114,34 @@ public class AlbumBehavior extends InteractionBehavior {
                 text.setText(files[0].getName());
                 text.setSelectAllOnFocus(true);
 
+                // Create a temporary dialog where the user can rename the album
                 AlertDialog dialog = new AlertDialog.Builder(fragment.getActivity())
                         .setIcon(R.drawable.ic_action_edit)
-                        .setTitle("Rename picture")
+                        .setTitle(R.string.rename_picture)
                         .setView(text)
-                        .setPositiveButton("Rename", new DialogInterface.OnClickListener() {
+                        .setPositiveButton(R.string.rename, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                String name = String.valueOf(text.getText()).trim();
+                                String name = String.valueOf(text.getText()).trim(); // remove surrounding white space
                                 files[0].renameTo(new File(files[0].getParentFile(), name));
                                 mode.finish();
                             }
                         })
-                        .setNegativeButton("Cancel", null)
+                        .setNegativeButton(R.string.cancel, null)
                         .create();
 
+                // Make sure that the soft keyboard is opened together with the dialog so the user
+                // can start typing immediately.
                 dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
                 dialog.show();
                 break;
             case R.id.delete:
+                // Create a confirmation dialog.
                 new AlertDialog.Builder(fragment.getActivity())
                         .setIcon(R.drawable.ic_action_discard)
-                        .setTitle("Confirm deletion")
-                        .setMessage("Are you sure you want to delete these pictures?")
-                        .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                        .setTitle(R.string.confirm_delete)
+                        .setMessage(R.string.confirm_delete_message)
+                        .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 storage.delete(files);
@@ -96,21 +149,11 @@ public class AlbumBehavior extends InteractionBehavior {
                             }
 
                         })
-                        .setNegativeButton("Cancel", null)
+                        .setNegativeButton(R.string.cancel, null)
                         .show();
                 break;
         }
 
         return true;
-    }
-
-    @Override
-    public void onDestroyActionMode(ActionMode actionMode) {
-
-    }
-
-    @Override
-    public void onItemCheckedStateChanged(ActionMode actionMode, int i, long l, boolean b) {
-
     }
 }

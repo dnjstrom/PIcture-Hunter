@@ -13,5 +13,12 @@
     <string name="title_activity_camera">CameraActivity</string>
     <string name="title_activity_comparison">ComparisonActivity</string>
     <string name="distance">Distance:</string>
+    <string name="sdcard_unavailable">The app requires an external storage to be present.</string>
+    <string name="rename_picture">Rename picture</string>
+    <string name="rename">Rename</string>
+    <string name="cancel">Cancel</string>
+    <string name="confirm_delete">Confirm deletion</string>
+    <string name="confirm_delete_message">Are you sure you want to delete these pictures?</string>
+    <string name="delete">Delete</string>
 
 </resources>
