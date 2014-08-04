@@ -23,8 +23,11 @@ import se.nielstrom.picture_hunter.util.AsyncTaskListener;
 import se.nielstrom.picture_hunter.util.ImageSaverTask;
 import se.nielstrom.picture_hunter.util.Storage;
 
+/**
+ * Takes square images and stores the location where they were shot.
+ */
 public class CameraFragment extends Fragment implements View.OnClickListener, GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener, LocationListener {
-    private static final java.lang.String KEY_IMAGE_PATH = "KEY_REF_IMAGE_PATH";
+    private static final java.lang.String KEY_IMAGE_PATH = "KEY_IMAGE_PATH";
     private final Storage storage;
     private Camera camera;
     private String path;
@@ -75,6 +78,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Go
         CameraPreview preview = (CameraPreview) root.findViewById(R.id.camera_preview);
         camera = getCameraInstance();
 
+        // Show the camera view if available.
         if (camera != null) {
             preview.setCamera(camera);
         } else {
@@ -104,6 +108,10 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Go
         return c; // returns null if camera is unavailable
     }
 
+    /**
+     * Actually take the picture and store it in the file provided.
+     * @param view
+     */
     @Override
     public void onClick(View view) {
         camera.takePicture(null, null, new Camera.PictureCallback() {
@@ -129,6 +137,9 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Go
         return this;
     }
 
+    /**
+     * Callback for those interested in getting the captured image.
+     */
     public interface PictureCapturedListener {
         public void onPictureCaptured(File picture);
     }
@@ -137,7 +148,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Go
     @Override
     public void onConnected(Bundle bundle) {
         LocationRequest request = LocationRequest.create();
-        request.setInterval(30 * 1000);
+        request.setInterval(3 * 1000); // Request location updates every 3 seconds
         request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationClient.requestLocationUpdates(request, this);
     }
@@ -150,6 +161,7 @@ public class CameraFragment extends Fragment implements View.OnClickListener, Go
 
     @Override
     public void onLocationChanged(Location location) {
+        // Simply store the location for when the picture is taken.
         this.location = location;
         Log.d(getClass().getSimpleName(), "Latitude: " + location.getLatitude());
         Log.d(getClass().getSimpleName(), "Longitude: " + location.getLongitude());

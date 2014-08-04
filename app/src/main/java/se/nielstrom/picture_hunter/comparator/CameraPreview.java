@@ -14,7 +14,9 @@ import java.io.IOException;
 import java.util.List;
 
 
-
+/**
+ * Implementation of a SurfaceView on which the camera can and must render its view.
+ */
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
     private SurfaceHolder mHolder;
     private Camera mCamera;
@@ -67,6 +69,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         } catch (Exception e){}
 
 
+        // Handle the rotation of the camera so that it will be saved correctly
         Camera.CameraInfo info = new Camera.CameraInfo();
         Camera.getCameraInfo(Camera.CameraInfo.CAMERA_FACING_BACK, info);
         int rotation = ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getRotation();
@@ -89,7 +92,7 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         }
         int rotate = (info.orientation - degrees + 360) % 360;
 
-
+        // Set the rotation parameters
         Camera.Parameters params = mCamera.getParameters();
         params.setRotation(rotate);
         mCamera.setParameters(params);

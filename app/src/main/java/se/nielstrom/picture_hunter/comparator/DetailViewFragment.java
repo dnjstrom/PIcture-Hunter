@@ -27,9 +27,13 @@ import se.nielstrom.picture_hunter.util.ImageLoaderTask;
 import se.nielstrom.picture_hunter.util.ImageSaverTask;
 
 
+/**
+ * Loads a full-sized image into the fragment lazily and computes the distance to where the image
+ * was taken based on the smartphone's current position.
+ */
 public class DetailViewFragment extends Fragment implements GooglePlayServicesClient.ConnectionCallbacks, GooglePlayServicesClient.OnConnectionFailedListener, LocationListener {
 
-    private static final String KEY_IMAGE_PATH = "KEY_REF_IMAGE_PATH";
+    private static final String KEY_IMAGE_PATH = "KEY_IMAGE_PATH";
     private String path;
     private File image;
     private ImageView imgView;
@@ -67,10 +71,11 @@ public class DetailViewFragment extends Fragment implements GooglePlayServicesCl
         new ImageLoaderTask(imgView).setAsyncTaskListener(new AsyncTaskListener() {
             @Override
             public void onTaskComplete() {
-                progress.setVisibility(View.INVISIBLE);
+                progress.setVisibility(View.INVISIBLE); // Hide central progress bar when image is loaded.
             }
         }).execute(path);
 
+        // Lazily load image
         boolean isMatched = ImageSaverTask.readModelData(image).equals(ComparisonActivity.MATCHED);
         View matchedBadge = root.findViewById(R.id.matched);
         matchedBadge.setVisibility(isMatched ? View.VISIBLE : View.INVISIBLE);
@@ -98,7 +103,7 @@ public class DetailViewFragment extends Fragment implements GooglePlayServicesCl
     @Override
     public void onConnected(Bundle bundle) {
         LocationRequest request = LocationRequest.create();
-        request.setInterval(30 * 1000);
+        request.setInterval(3 * 1000); // ask for location updates every 3 seconds
         request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         locationClient.requestLocationUpdates(request, this);
     }
@@ -116,6 +121,7 @@ public class DetailViewFragment extends Fragment implements GooglePlayServicesCl
 
         Location target = ImageSaverTask.readLocationData(image);
 
+        // calculate distance to image capture location if location is available
         if (target != null) {
             float distance = location.distanceTo(target);
 
@@ -126,11 +132,12 @@ public class DetailViewFragment extends Fragment implements GooglePlayServicesCl
 
             String separator = " ";
             if (distance < 20) {
-                separator = " ~";
+                separator = " ~"; // Make the user aware that the smaller distances might be a tad approximate.
             }
 
+            // Format the distance as either meter or kilometer.
             if (distance >= 1500) {
-                distanceText.setText(getResources().getText(R.string.distance) + separator + String.format("%.2fkm", distance));
+                distanceText.setText(getResources().getText(R.string.distance) + separator + String.format("%.1fkm", distance));
             } else {
                 distanceText.setText(getResources().getText(R.string.distance) + separator + Math.round(distance) + "m");
             }
