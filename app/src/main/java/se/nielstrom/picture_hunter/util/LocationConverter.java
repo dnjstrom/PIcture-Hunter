@@ -16,6 +16,14 @@ public class LocationConverter {
         return longitude > 0 ? "E" : "W";
     }
 
+    public static int getSign(String ref) {
+        if (ref.equals("N") || ref.equals("E")) {
+            return 1;
+        } else {
+            return -1;
+        }
+    }
+
     public static String toDMS(double decimal) {
         double degrees = decimal;
         double minutes = (60 * (decimal - Math.floor(degrees)));

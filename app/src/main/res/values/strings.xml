@@ -12,5 +12,6 @@
     <string name="title_activity_photo_list">PhotoListActivity</string>
     <string name="title_activity_camera">CameraActivity</string>
     <string name="title_activity_comparison">ComparisonActivity</string>
+    <string name="distance">Distance:</string>
 
 </resources>

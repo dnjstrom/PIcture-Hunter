@@ -97,6 +97,27 @@ public class ImageSaverTask extends AsyncTask<Void, Void, Void> {
         }
     }
 
+    public static Location readLocationData(File file) {
+        Location location = null;
+        try {
+            ExifInterface exif = new ExifInterface(file.getAbsolutePath());
+            String lat = exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE);
+            String latRef = exif.getAttribute(ExifInterface.TAG_GPS_LATITUDE_REF);
+            String lon = exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE);
+            String lonRef = exif.getAttribute(ExifInterface.TAG_GPS_LONGITUDE_REF);
+
+            double latitude = LocationConverter.fromDMS(lat) * LocationConverter.getSign(latRef);
+            double longitude = LocationConverter.fromDMS(lon) * LocationConverter.getSign(lonRef);
+
+            location = new Location("dummy");
+            location.setLatitude(latitude);
+            location.setLongitude(longitude);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return location;
+    }
+
     @Override
     protected void onPostExecute(Void v) {
         if (listener != null) {
