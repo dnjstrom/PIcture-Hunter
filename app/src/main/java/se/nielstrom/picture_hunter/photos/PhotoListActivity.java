@@ -27,10 +27,12 @@ import se.nielstrom.picture_hunter.comparator.CameraFragment;
 import se.nielstrom.picture_hunter.common.FoldersPagerAdapter;
 import se.nielstrom.picture_hunter.util.Storage;
 
+/**
+ * Holds a viewpager containing fragments for different albums, each showing a grid of images.
+ */
 public class PhotoListActivity extends FragmentActivity implements Storage.ClipboardListener {
 
-    public static final String KEY_PATH = "KEY_REF_IMAGE_PATH";
-    public static final String KEY_POSITION = "KEY_POSITION";
+    public static final String KEY_PATH = "KEY_PATH";
 
     private String path;
     private File file;
@@ -38,7 +40,6 @@ public class PhotoListActivity extends FragmentActivity implements Storage.Clipb
     private FoldersPagerAdapter adapter;
     private Storage storage;
     private Menu menu;
-    private NfcAdapter nfcAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +49,7 @@ public class PhotoListActivity extends FragmentActivity implements Storage.Clipb
         storage = Storage.getInstance(this);
         storage.addOnClipboardListener(this);
 
+        // Get the location from where to show images.
         Bundle extras = getIntent().getExtras();
         path = extras.getString(KEY_PATH);
         file = new File(path);
@@ -62,6 +64,7 @@ public class PhotoListActivity extends FragmentActivity implements Storage.Clipb
         pager.setAdapter(adapter);
 
         try {
+            // move the pager to the actual album sought
             int position = adapter.getFolderPosition(file);
             pager.setCurrentItem(position);
         } catch (IndexOutOfBoundsException e) {}
@@ -97,6 +100,9 @@ public class PhotoListActivity extends FragmentActivity implements Storage.Clipb
         return adapter.getFolder(pager.getCurrentItem());
     }
 
+    /**
+     * Show the paste action button if there's something in the clipboard
+     */
     @Override
     public void onClipboardChanged() {
         menu.findItem(R.id.paste).setVisible(storage.getClipboardCount() > 0);

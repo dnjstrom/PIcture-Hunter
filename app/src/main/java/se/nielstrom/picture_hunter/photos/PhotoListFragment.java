@@ -26,11 +26,13 @@ import se.nielstrom.picture_hunter.comparator.CameraFragment;
 import se.nielstrom.picture_hunter.comparator.ComparisonActivity;
 import se.nielstrom.picture_hunter.util.ImageLoaderTask;
 import se.nielstrom.picture_hunter.util.ImageSaverTask;
-import se.nielstrom.picture_hunter.util.InteractionBehavior;
 import se.nielstrom.picture_hunter.util.Storage;
 
+/**
+ * Displays a grid of lazily loaded image miniatures.
+ */
 public class PhotoListFragment extends Fragment implements NfcAdapter.CreateBeamUrisCallback{
-    private static final String KEY_PATH = "KEY_REF_IMAGE_PATH";
+    private static final String KEY_PATH = "KEY_PATH";
     private static final int THUMB_SIZE = 384;
 
     private String path;
@@ -41,6 +43,7 @@ public class PhotoListFragment extends Fragment implements NfcAdapter.CreateBeam
     private Storage storage;
 
 
+    // Creates a new instance for the path given
     public static PhotoListFragment newInstance(String absolutePath) {
         PhotoListFragment fragment = new PhotoListFragment();
         Bundle args = new Bundle();
@@ -72,16 +75,18 @@ public class PhotoListFragment extends Fragment implements NfcAdapter.CreateBeam
         adapter = new PictureAdapter(getActivity(), album);
         grid.setAdapter(adapter);
 
-        InteractionBehavior behavior;
+        PhotoBehavior behavior;
 
+        // Switch behavior depending on if this is a user album or a foreign album.
         if (storage.isUserFile(album)) {
             behavior = new UserFileBehavior();
             adapter.setShowAddButton(true);
         } else {
             behavior = new ForeignFileBehavior();
-            adapter.setShowAddButton(false);
+            adapter.setShowAddButton(false); // Don't show an add button
         }
 
+        // Set the behavior
         adapter.setAddListener(behavior);
         grid.setOnItemClickListener(behavior);
         grid.setMultiChoiceModeListener(behavior);
@@ -89,6 +94,7 @@ public class PhotoListFragment extends Fragment implements NfcAdapter.CreateBeam
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(getActivity());
         if (nfcAdapter == null) {
+            // This should technically never happen as NFC-capabilities are required to install the app.
             Toast.makeText(getActivity(), "NFC is not available", Toast.LENGTH_LONG).show();
         } else {
             nfcAdapter.setBeamPushUrisCallback(this, getActivity());
@@ -97,11 +103,18 @@ public class PhotoListFragment extends Fragment implements NfcAdapter.CreateBeam
         return root;
     }
 
+    /**
+     * Collects the currently selected photos for beaming when an NFC transfer is initiated.
+     *
+     * @param nfcEvent
+     * @return
+     */
     @Override
     public Uri[] createBeamUris(NfcEvent nfcEvent) {
         Uri[] uris = new Uri[grid.getCheckedItemCount()];
         SparseBooleanArray checked = grid.getCheckedItemPositions();
 
+        // Collect selected photos
         for (int i = 0, j=0; i < grid.getCount() && j < uris.length; i++) {
             if (checked.get(i)) {
                 uris[j] = Uri.fromFile(adapter.getItem(i));
@@ -113,12 +126,18 @@ public class PhotoListFragment extends Fragment implements NfcAdapter.CreateBeam
     }
 
 
+    /**
+     * Provides the image-files for the GridView.
+     */
     private class PictureAdapter extends FileAdapter {
 
         public PictureAdapter(Context context, File location) {
             super(context, R.layout.add_picture, location, new FileFilter() {
                 @Override
                 public boolean accept(File file) {
+                    // Only list non-directories. Since we don't actually check for images
+                    // explicitly, if the user were to manually move in files in the app storage
+                    // area we could potentially run into trouble.
                     return file.isFile();
                 }
             });
@@ -127,12 +146,12 @@ public class PhotoListFragment extends Fragment implements NfcAdapter.CreateBeam
         @Override
         protected View createFileView(int position, View view, ViewGroup parent) {
             File file = getItem(position);
-            String s = ImageSaverTask.readModelData(file);
             boolean matched = ImageSaverTask.readModelData(file).equals(ComparisonActivity.MATCHED);
 
             ViewHolder holder;
 
             if (view == null ) {
+                // Create a new View and ViewHolder if they don't exist
                 LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
                 view = inflater.inflate(R.layout.file_item, parent, false);
                 holder = new ViewHolder(view);
@@ -142,6 +161,7 @@ public class PhotoListFragment extends Fragment implements NfcAdapter.CreateBeam
             }
 
             holder.title.setText(file.getName());
+            // Lazily load the image miniature
             new ImageLoaderTask(holder.image, THUMB_SIZE, THUMB_SIZE).execute(file.getAbsolutePath());
             holder.matched.setVisibility(matched ? View.VISIBLE: View.INVISIBLE);
 
@@ -162,11 +182,22 @@ public class PhotoListFragment extends Fragment implements NfcAdapter.CreateBeam
         }
     }
 
+    /**
+     * Handles interactions for user files.
+     */
     private class UserFileBehavior extends PhotoBehavior {
         public UserFileBehavior() {
             super(PhotoListFragment.this);
         }
 
+        /**
+         * Launch the default gallery app or similar to view the image.
+         *
+         * @param adapterView
+         * @param view
+         * @param position
+         * @param l
+         */
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
             Intent intent = new Intent();
@@ -176,6 +207,11 @@ public class PhotoListFragment extends Fragment implements NfcAdapter.CreateBeam
             startActivity(intent);
         }
 
+        /**
+         * Launch the apps custom camera fragment in order to capture a photo.
+         *
+         * @param view
+         */
         @Override
         public void onClick(View view) {
             File image = storage.createImageFileAt(album);
@@ -189,11 +225,22 @@ public class PhotoListFragment extends Fragment implements NfcAdapter.CreateBeam
     }
 
 
+    /**
+     * Handles interactions for foreign files.
+     */
     private class ForeignFileBehavior extends PhotoBehavior {
         public ForeignFileBehavior() {
             super(PhotoListFragment.this);
         }
 
+        /**
+         * Launch a ComparisonActivity for the selected file.
+         *
+         * @param adapterView
+         * @param view
+         * @param position
+         * @param l
+         */
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
             File file = (File) adapterView.getItemAtPosition(position);

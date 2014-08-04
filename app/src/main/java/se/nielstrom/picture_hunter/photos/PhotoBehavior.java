@@ -19,23 +19,28 @@ import java.io.IOException;
 
 import se.nielstrom.picture_hunter.R;
 import se.nielstrom.picture_hunter.common.FileAdapter;
-import se.nielstrom.picture_hunter.util.InteractionBehavior;
+import se.nielstrom.picture_hunter.util.Storage;
 
-public abstract class PhotoBehavior extends InteractionBehavior {
+/**
+ * Takes care of the photo selection and context menu interactions for the photo fragment.
+ */
+public abstract class PhotoBehavior implements AdapterView.OnItemClickListener,
+                                                View.OnClickListener,
+                                                GridView.MultiChoiceModeListener {
+
+    private final Fragment fragment;
+    private final Storage storage;
 
     public PhotoBehavior(Fragment fragment) {
-        super(fragment);
+        this.fragment = fragment;
+        storage = Storage.getInstance(fragment.getActivity());
     }
 
     @Override
-    public void onClick(View view) {
-
-    }
+    public void onClick(View view) {}
 
     @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-    }
+    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {}
 
 
     @Override
@@ -50,6 +55,30 @@ public abstract class PhotoBehavior extends InteractionBehavior {
     }
 
     @Override
+    public void onDestroyActionMode(ActionMode mode) {
+    }
+
+    @Override
+    public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+        GridView grid = (GridView) fragment.getView().findViewById(R.id.grid);
+
+        // Only show the rename action if a single photo is selected.
+        if (grid.getCheckedItemCount() == 1) {
+            mode.getMenu().findItem(R.id.rename).setVisible(true);
+        } else {
+            mode.getMenu().findItem(R.id.rename).setVisible(false);
+        }
+
+        return;
+    }
+
+    /**
+     * Handles button presses on the contextual action bar appropriately.
+     * @param mode
+     * @param item
+     * @return
+     */
+    @Override
     public boolean onActionItemClicked(final ActionMode mode, MenuItem item) {
         GridView grid = (GridView) fragment.getView().findViewById(R.id.grid);
         final FileAdapter adapter = (FileAdapter) grid.getAdapter();
@@ -57,6 +86,7 @@ public abstract class PhotoBehavior extends InteractionBehavior {
 
         final File[] files = new File[grid.getCheckedItemCount()];
 
+        // extract the selected files for easy manipulation
         for (int i = 0, j = 0; i < adapter.getCount() && j < files.length; i++) {
             if (checked.get(i)) {
                 files[j] = adapter.getItem(i);
@@ -71,11 +101,12 @@ public abstract class PhotoBehavior extends InteractionBehavior {
                 text.setText(files[0].getName());
                 text.setSelectAllOnFocus(true);
 
+                // Create a custom dialog to change the name
                 AlertDialog dialog = new AlertDialog.Builder(fragment.getActivity())
                         .setIcon(R.drawable.ic_action_edit)
-                        .setTitle("Rename picture")
+                        .setTitle(R.string.rename_picture)
                         .setView(text)
-                        .setPositiveButton("Rename", new DialogInterface.OnClickListener() {
+                        .setPositiveButton(R.string.rename, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 String name = String.valueOf(text.getText()).trim();
@@ -83,36 +114,38 @@ public abstract class PhotoBehavior extends InteractionBehavior {
                                 mode.finish();
                             }
                         })
-                        .setNegativeButton("Cancel", null)
+                        .setNegativeButton(R.string.cancel, null)
                         .create();
 
+                // Make sure the keyboard is displayed when the dialog opens
                 dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
                 dialog.show();
                 break;
             case R.id.copy:
                 try {
                     storage.copy(files);
-                    Toast.makeText(fragment.getActivity(), "Files have been copied", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(fragment.getActivity(), R.string.files_copied, Toast.LENGTH_SHORT).show();
                     mode.finish();
                 } catch (IOException e) {
-                    Toast.makeText(fragment.getActivity(), "Couldn't copy the files", Toast.LENGTH_LONG).show();
+                    Toast.makeText(fragment.getActivity(), R.string.files_not_copied, Toast.LENGTH_LONG).show();
                 }
                 break;
             case R.id.cut:
                 try {
                     storage.cut(files);
-                    Toast.makeText(fragment.getActivity(), "Files have been cut", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(fragment.getActivity(), R.string.files_cut, Toast.LENGTH_SHORT).show();
                     mode.finish();
                 } catch (IOException e) {
-                    Toast.makeText(fragment.getActivity(), "Couldn't cut the files", Toast.LENGTH_LONG).show();
+                    Toast.makeText(fragment.getActivity(), R.string.files_not_cut, Toast.LENGTH_LONG).show();
                 }
                 break;
             case R.id.delete:
+                //Launch a confirmation dialog.
                 new AlertDialog.Builder(fragment.getActivity())
                         .setIcon(R.drawable.ic_action_discard)
-                        .setTitle("Confirm deletion")
-                        .setMessage("Are you sure you want to delete these pictures?")
-                        .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                        .setTitle(R.string.confirm_delete)
+                        .setMessage(R.string.confirm_delete_message)
+                        .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 storage.delete(files);
@@ -120,28 +153,11 @@ public abstract class PhotoBehavior extends InteractionBehavior {
                             }
 
                         })
-                        .setNegativeButton("Cancel", null)
+                        .setNegativeButton(R.string.cancel, null)
                         .show();
                 break;
         }
 
         return true;
-    }
-
-    @Override
-    public void onDestroyActionMode(ActionMode mode) {
-    }
-
-    @Override
-    public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-        GridView grid = (GridView) fragment.getView().findViewById(R.id.grid);
-
-        if (grid.getCheckedItemCount() == 1) {
-            mode.getMenu().findItem(R.id.rename).setVisible(true);
-        } else {
-            mode.getMenu().findItem(R.id.rename).setVisible(false);
-        }
-
-        return;
     }
 }
