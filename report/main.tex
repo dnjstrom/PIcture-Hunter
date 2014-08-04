@@ -71,7 +71,7 @@
 
 	Denna del av appen fungerar i huvudsak som en filhanterare begränsad till appens externa lagringsutrymme. Lagringsutrymmet utgörs inte av appens privata utrymme utan består av en mapp som är nåbara av alla applikationer och som inte tas bort automatiskt vid avinstallering av appen. Detta val är gjort som en följd av designprincipen ``Never lose my stuff''\cite{Principles}.
 
-	Filhanteringen sker i två lager. Det första lagret hanterar ``album'' - sammlingar av bilder. Detta lagret kan ses i figur \ref{fig:albums}. Ett nytt album skapas genom att man klickar på ikonen med en mapp och ett plusstecken. Om man markerar en app genom att hålla ner fingret på den en kort tid visas en ny ActionBar\cite{ContextActionBar} som ger möjligheten att byta namn eller ta bort albumet (se figur \ref{fig:albums_selection}). Detta följer androids designprincip ``Only show what I need when I need it''\cite{Principles}. Omdöpning av album görs med hjälp av en dialogruta anpassad för ändamålet. Vid borttagning av album visas också en dialogruta där användaren måste bekräfta valet\cite{Dialogs}. Dialogrutorna kan ses i figur \ref{fig:albums_selection_rename} och figur \ref{fig:albums_selection_delete}.
+	Filhanteringen sker i två lager. Det första lagret hanterar ``album'' - sammlingar av bilder. Detta lagret kan ses i figur \ref{fig:albums}. Ett nytt album skapas genom att man klickar på ikonen med en mapp och ett plusstecken. Om man markerar en app genom att hålla ner fingret på den en kort tid visas en ny \emph{ActionBar}\cite{ContextActionBar} som ger möjligheten att byta namn eller ta bort albumet (se figur \ref{fig:albums_selection}). Detta följer androids designprincip ``Only show what I need when I need it''\cite{Principles}. Omdöpning av album görs med hjälp av en dialogruta anpassad för ändamålet. Vid borttagning av album visas också en dialogruta där användaren måste bekräfta valet\cite{Dialogs}. Dialogrutorna kan ses i figur \ref{fig:albums_selection_rename} och figur \ref{fig:albums_selection_delete}.
 
 	Förutom de olika albumen finns två olika typer av album - egna album och främmande album. Egna album är album med bilder du tagit. Främmande album innehåller bilder du ska försöka matcha. De olika typerna av album presenteras i en horisontellt paginerad lista som rekomenderas för navigering bland kategorier\cite{HorizontalPaging}. För att användaren inte ska tappa bort vart hen befinner sig skrivs den nuvarande positionen ut i det ljusblå bandet ovanför listan med album (uppfyller designprincip ``I should always know where I am''\cite{Principles} ).
 
@@ -93,7 +93,7 @@
 
 	Appen är uppbyggd med tre aktiviteter - en för album-vyn, en för bild-vyn och en för jämförelse. De första två hade nog kunnat slås ihop till en ända aktivitet, men uppdelningen hjälper till att separera vad som ska hända vid användarinteraktion. Genom att gemensam kod extraherats till egna klasser dupliceras dessutom kod endast marginellt.
 
-	Samtliga gränssnitt implementeras i huvudsak som fragment som i största möjliga mån är fristående från dess aktivitet. Vid behov används dock aktiviten som en mellanhand mellan fragmenten\cite{FragmentCommunication}. Ett tydligt exempel på detta är ComparisonActivity som startar och avslutar de båda fragmenten efter vad som är lämpligt och som tar hand om bilden som kameran tagit.
+	Samtliga gränssnitt implementeras i huvudsak som fragment som i största möjliga mån är fristående från dess aktivitet. Vid behov används dock aktiviten som en mellanhand mellan fragmenten\cite{FragmentCommunication}. Ett tydligt exempel på detta är \emph{ComparisonActivity} som startar och avslutar de båda fragmenten efter vad som är lämpligt och som tar hand om bilden som kameran tagit.
 
 	Appen uppvisar flera tekniska finesser. Några av dessa är ganska nyligen tillgada i Android så applikationen kräver en tämligen uppdaterad telefon. Den kräver även att telefonen har ett SD-kort, en kamera och NFC-förmåga.
 
@@ -107,24 +107,35 @@
 
 \subsection{Kamera}
 \label{subsec:camera}
-	Då olika telefoner kan ta bilder i olika upplösning behövs någon standard införas på bilderna för att de ska kunna jämföras på ett rättvist sätt av algoritmen i avsnitt \ref{subsec:image_recog}. I vanliga fall skulle uppgiften att ta en bild delegeras till telefonens standardkameraapp men ett Intent med ACTION\_IMAGE\_CAPTURE har ingen möjlighet att påverka den slutliga storleken. Man hade kunnat normalisera bilden efteråt men då tar användaren en avlång bild men en liksidig sparas till disk. För att inte överraska användaren behöver kamerans bild motsvara slutresultatet. För att åstadkomma detta implementerades ett specialgjort kamerafragment. Kamerafragmentet används till all bildtagning i appen och begränsar bilderna till 1024x1024 pixlar.
+	Då olika telefoner kan ta bilder i olika upplösning behövs någon standard införas på bilderna för att de ska kunna jämföras på ett rättvist sätt av algoritmen i avsnitt \ref{subsec:image_recog}. I vanliga fall skulle uppgiften att ta en bild delegeras till telefonens standardkameraapp men ett \emph{Intent} med \emph{ACTION\_IMAGE\_CAPTURE} har ingen möjlighet att påverka den slutliga storleken. Man hade kunnat normalisera bilden efteråt men då tar användaren en avlång bild men en liksidig sparas till disk. För att inte överraska användaren behöver kamerans bild motsvara slutresultatet. För att åstadkomma detta implementerades ett specialgjort kamerafragment. Kamerafragmentet används till all bildtagning i appen och begränsar bilderna till 1024x1024 pixlar.
 
 \subsection{GPS}
 	När en kameran i avsnitt \ref{subsec:camera} öppnas börjar appen fråga efter användarens koordinater. Om dessa funnits i tid till att bilden tas sparas dessa tillsammans med bilden som metadata och används för att ge spelaren som ska matcha bilden en idé om avståndet till platsen där bilden tagits.
 
 \subsection{Near Field Communication (NFC)}
-	För att dela bilder mellan två telefoner använder sig appen av Near Field Communication i from av Android Beam. Överföring av filer med hjälp av Android Beam lades till först i api-nivå 16 vilket sätter detta som minimi-sdk-krav för att kunna använda appen. Så fort telefonen förs nära en annan (ca 4cm) kommer appen kontrollera om det finns bilder markerade. Dessa förs i så fall över till den andra telefonen och appen öppnas i så fall via ett speciellt Intent Filter. På grund av hur Android Beam är implementerad levereras de nya filerna med hjälp av en Content Provider som appen läser från och flyttar in filerna till appens filarea.
+	För att dela bilder mellan två telefoner använder sig appen av Near Field Communication i from av \emph{Android Beam}. Överföring av filer med hjälp av Android Beam lades till först i api-nivå 16 vilket sätter detta som minimi-sdk-krav för att kunna använda appen. Så fort telefonen förs nära en annan (ca 4cm) kommer appen kontrollera om det finns bilder markerade. Dessa förs i så fall över till den andra telefonen och appen öppnas i så fall via ett speciellt Intent Filter. De nya filerna levereras sedan med hjälp av en \emph{Content Provider} som appen läser ifrån och flyttar in filerna till appens filarea.
 
 \subsection{ViewPager}
-	ViewPager är en del av a support library.
+\label{subsec:viewpager}
+	ViewPager är ett ofärdigt\cite{ViewPager} men populärt api för lateral navigation. Vyn ska integreras i Androids normala api i framtiden men för tillfället finns en tidig version tillgänglig som en del av a \emph{android support library}.
 
 \subsection{Animation}
+	I appen finns en kort-vändnings-animation för bytet mellan den in-zoomade bildvyn och kameravyn. Animationen är specificerad i xml men använder det gamla animtionsbiblioteket istället för \emph{Animator} klasserna. Detta kommer sig av att \emph{Fragment}-klassen i supportbiblioteket, som måste användas i ViewPager:n från avsnitt \ref{subsec:viewpager}, inte stödjer det nya biblioteket\cite{SupportAnimator}. Av denna anledning är inte rotationen inte en ``riktig'' rotation utan istället är vyns skala i x-led animerad för att ge motsvarande intryck.
+
+	Även en zoom-aninmation där minatyrbilden zoomades in och blev stor utvecklades (med animator biblioteket) och användes tidigt i projektet. Denna animation tvingades dock tas bort när den in-zoomade vyn byggdes om som ett eget fragment.
 
 \subsection{Specialgjorda vyer och attribut}
+	Två specialgjorda Views byggdes som en del i framtagandet av gränssnittet. Den ena är en fyrkantsvy som alltid är lika bred som hög. Man kan specificera i xml om den ska anpassa sig efter den tillgängliga höjden eller bredden. Denna funkionalitet kom till användning när appen behövde anpassas till landskapsläge.
+
+	Den andra vy är en specialgjord layout som implementerar Checkable gränssnittet samt definierar ett extra drawable state för när vyn är ``kryssad''. Detta ger möjligheten att specificera bakgrunden med standard drawables. Vyn använder sig dessutom av ett semi-transparent lager som kan läggas in överst i layouten och därmed ge en färgförändring när vyn kryssas, trotts att bakgrunden täcks av andra komponenter. På detta sätt stödjer vyn användning både för album och bilder.
 
 \subsection{Exif metadata}
+	GPS datan som samplas in av kameran (avsnitt \ref{subsec:camera}) sparas som metadata i \emph{EXchangeable Image File}-format. För att kunna spara positionen i detta format behöver den först konverteras från decimal-format till timme/minut/sekund-format.
+
+	Förutom gps-positionen sparas även om en bild har blivit matchad eller inte i bildens metadata. Androids förmåga att skriva Exif-data till en bild är ganska begränsad genom att endast vissa taggar stöds. På grund av detta skrivs matchnings-statusen till \emph{Model}-fältet istället.
 
 \subsection{Backgrundsarbete och laddning}
+	All bildhantering i appen är flyttat till bakgrundstrådar för att inte låsa gränssnittet\cite{BitmapProcessing}. Detta ses tydligast i listorna av bildminiatyrer där bilderna ibland dyker upp först efter en kort fördröjning. Dessutom undviker applikationen att ladda in stora bilder i minnet. Med hjälp av \emph{ThumbnailUtils} skapas miniatyrbilder i låg upplösning som låter appen hushålla bättre med sin minneskvota.
 
 
 \section{Reflektion}
