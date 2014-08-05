@@ -106,7 +106,7 @@ public class ComparisonActivity extends FragmentActivity implements CameraFragme
     }
 
     /**
-     * Houses the actual comparison and decides weather an image has been correctly matched.
+     * Houses the actual comparison and decides whether an image has been correctly matched.
      *
      * @param picture
      */

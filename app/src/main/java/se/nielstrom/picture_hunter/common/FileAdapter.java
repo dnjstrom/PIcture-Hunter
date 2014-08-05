@@ -16,13 +16,14 @@ import java.io.FileFilter;
 
 import se.nielstrom.picture_hunter.R;
 
-
+/**
+ * Adapter for File objects which optionally inserts an "add"-button at the end of the list.
+ */
 public abstract class FileAdapter extends ArrayAdapter<File> implements View.OnClickListener {
     private static final int FILE_EVENTS = FileObserver.CREATE | FileObserver.DELETE | FileObserver.MOVED_FROM | FileObserver.MOVED_TO;
 
     private static final String BUTTON_TAG = FileAdapter.class + "_add_button";
 
-    private static final int DATA_CHANGED = 0;
     private static final String KEY_PATH = "KEY_REF_IMAGE_PATH";
 
     private final FileObserver observer;
@@ -33,6 +34,9 @@ public abstract class FileAdapter extends ArrayAdapter<File> implements View.OnC
 
     private boolean showAddButton = true;
 
+    /**
+     * Responds to file system changes by adding or removing files accordingly.
+     */
     private Handler handler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -45,6 +49,7 @@ public abstract class FileAdapter extends ArrayAdapter<File> implements View.OnC
 
             File file = new File(location, path);
 
+            // Check the binary flags
             if ((FileObserver.CREATE & msg.what) != 0 || (FileObserver.MOVED_TO & msg.what) != 0) {
                 if (filter.accept(file)) {
                     add(file);
@@ -100,6 +105,7 @@ public abstract class FileAdapter extends ArrayAdapter<File> implements View.OnC
 
     @Override
     public View getView(int i, View view, ViewGroup parent) {
+        // Handle the add button creation and delegate everything else to implementing classes.
         if (showAddButton && i == super.getCount()) {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(addButtonId, parent, false);
@@ -114,12 +120,32 @@ public abstract class FileAdapter extends ArrayAdapter<File> implements View.OnC
         }
     }
 
+    /**
+     * Instead of overriding getView, subclasses should implement this method which is responsible
+     * for creating the views for any file objects.
+     *
+     * @param position
+     * @param view
+     * @param parent
+     * @return
+     */
     protected abstract View createFileView(int position, View view, ViewGroup parent);
 
+    /**
+     * Returns whether the view is actually the add-button.
+     *
+     * @param view
+     * @return True if the view is the add-button, false otherwise
+     */
     public static boolean isButton(View view) {
         return view != null && view.getTag() == BUTTON_TAG;
     }
 
+    /**
+     * Sets the listener for the add-button.
+     *
+     * @param listener
+     */
     public void setAddListener(View.OnClickListener listener) {
         this.listener = listener;
     }
@@ -131,6 +157,11 @@ public abstract class FileAdapter extends ArrayAdapter<File> implements View.OnC
         }
     }
 
+    /**
+     * Shows or hides the Add-button.
+     *
+     * @param show
+     */
     public void setShowAddButton(boolean show) {
         if (show != showAddButton) {
             showAddButton = show;
@@ -139,6 +170,10 @@ public abstract class FileAdapter extends ArrayAdapter<File> implements View.OnC
     }
 
 
+    /**
+     * Watches for file changes in a separate thread but delegates the work to the UI-thread
+     * when events happen.
+     */
     private class Observer extends FileObserver {
 
         public Observer(String path) {

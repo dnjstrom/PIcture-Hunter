@@ -91,7 +91,7 @@ public class AlbumListActivity extends FragmentActivity {
             file = handleContentUri(beamUri);
         }
 
-        // Adjust paths if only one file is beamed
+        // act accordingly if only one file is beamed
         if (file.getParentFile().getName().equals("beam")) {
             receiveFile(file);
         } else {
@@ -99,14 +99,21 @@ public class AlbumListActivity extends FragmentActivity {
         }
     }
 
+    /**
+     * Handles a single file transfer.
+     *
+     * @param source
+     */
     private void receiveFile(File source) {
         File album = new File(Storage.FOREIGN_ALBUMS, "New Beam Album");
         album = Storage.makeUnique(album);
         File destination = new File(album, source.getName());
         destination.getParentFile().mkdirs();
 
+        // move the file
         source.renameTo(destination);
 
+        // clear matched status
         ImageSaverTask.writeModelData(destination, "");
 
         // Display the new file
@@ -115,6 +122,11 @@ public class AlbumListActivity extends FragmentActivity {
         startActivity(i);
     }
 
+    /**
+     * Handle the transfer of multiple files.
+     *
+     * @param dir
+     */
     private void receiveDirectory(File dir) {
         File destination = new File(Storage.FOREIGN_ALBUMS, "New Beam Album");
         destination = Storage.makeUnique(destination);

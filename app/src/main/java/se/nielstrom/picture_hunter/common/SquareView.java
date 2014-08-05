@@ -7,6 +7,9 @@ import android.widget.LinearLayout;
 
 import se.nielstrom.picture_hunter.R;
 
+/**
+ * A forced square view. One can change whether the size is determined by width or height.
+ */
 public class SquareView extends LinearLayout {
     private boolean sizeByHeight = false;
 
@@ -24,6 +27,11 @@ public class SquareView extends LinearLayout {
         handleAttrs(attrs);
     }
 
+    /**
+     * Look for xml attributes and set members accordingly.
+     *
+     * @param attrs
+     */
     private void handleAttrs(AttributeSet attrs) {
         TypedArray a = getContext().getTheme().obtainStyledAttributes(attrs, R.styleable.SquareView, 0, 0);
 

@@ -10,11 +10,11 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Created by Daniel on 2014-07-27.
+ * Manages the fragment "pages" of the apps view pagers.
  */
 public abstract class FoldersPagerAdapter extends FragmentStatePagerAdapter {
-    protected List<File> folders;
-    protected File location;
+    protected File location; // The directory from where folders are collected
+    protected List<File> folders; // The folders in location
 
     public FoldersPagerAdapter(FragmentManager fm, File location) {
         super(fm);
@@ -24,16 +24,22 @@ public abstract class FoldersPagerAdapter extends FragmentStatePagerAdapter {
         folders = new ArrayList<File>(Arrays.asList(location.listFiles(new FileFilter() {
             @Override
             public boolean accept(File file) {
-                return file.isDirectory();
+                return file.isDirectory(); // Only list folders.
             }
         })));
     }
 
 
+    /**
+     * Search for the folder with the given path.
+     *
+     * @param file
+     * @return
+     */
     public int getFolderPosition(File file) {
         for (int i = 0; i < folders.size(); i++) {
             if (folders.get(i).equals(file)) {
-                return i;
+                return i; // End early if found
             }
         }
 
