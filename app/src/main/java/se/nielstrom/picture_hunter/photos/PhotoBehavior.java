@@ -144,7 +144,7 @@ public abstract class PhotoBehavior implements AdapterView.OnItemClickListener,
                 new AlertDialog.Builder(fragment.getActivity())
                         .setIcon(R.drawable.ic_action_discard)
                         .setTitle(R.string.confirm_delete)
-                        .setMessage(R.string.confirm_delete_message)
+                        .setMessage(R.string.confirm_delete_picture_message)
                         .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {

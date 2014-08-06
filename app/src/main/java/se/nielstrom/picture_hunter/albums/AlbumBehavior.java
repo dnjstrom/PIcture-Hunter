@@ -116,7 +116,7 @@ public class AlbumBehavior  implements AdapterView.OnItemClickListener,
                 // Create a temporary dialog where the user can rename the album
                 AlertDialog dialog = new AlertDialog.Builder(fragment.getActivity())
                         .setIcon(R.drawable.ic_action_edit)
-                        .setTitle(R.string.rename_picture)
+                        .setTitle(R.string.rename_album)
                         .setView(text)
                         .setPositiveButton(R.string.rename, new DialogInterface.OnClickListener() {
                             @Override
@@ -139,7 +139,7 @@ public class AlbumBehavior  implements AdapterView.OnItemClickListener,
                 new AlertDialog.Builder(fragment.getActivity())
                         .setIcon(R.drawable.ic_action_discard)
                         .setTitle(R.string.confirm_delete)
-                        .setMessage(R.string.confirm_delete_message)
+                        .setMessage(R.string.confirm_delete_album_message)
                         .setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {

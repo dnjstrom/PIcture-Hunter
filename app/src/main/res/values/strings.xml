@@ -18,11 +18,13 @@
     <string name="rename">Rename</string>
     <string name="cancel">Cancel</string>
     <string name="confirm_delete">Confirm deletion</string>
-    <string name="confirm_delete_message">Are you sure you want to delete these pictures?</string>
+    <string name="confirm_delete_picture_message">Are you sure you want to delete these pictures?</string>
     <string name="delete">Delete</string>
     <string name="files_copied">Files have been copied</string>
     <string name="files_not_copied">Couldn\'t copy the files</string>
     <string name="files_cut">Files have been cut</string>
     <string name="files_not_cut">Couldn\'t cut the files</string>
+    <string name="rename_album" >Rename album</string>
+    <string name="confirm_delete_album_message">Are you sure you want to delete these albums?</string>
 
 </resources>
